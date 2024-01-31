@@ -1,0 +1,9 @@
+absl-py==2.1.0
+numpy==1.26.3
+ortools==9.8.3296
+pandas==2.2.0
+protobuf==4.25.2
+python-dateutil==2.8.2
+pytz==2023.4
+six==1.16.0
+tzdata==2023.4
