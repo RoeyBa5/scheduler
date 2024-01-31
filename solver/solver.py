@@ -3,15 +3,15 @@ from copy import deepcopy
 import pandas as pd
 from ortools.sat.python import cp_model
 
-from data_loader import load_shifts, load_operators
+from data_loader import load_slots, load_operators
 from models import Placement, Group, PlacementModel, PlacementModelConfig, Qualification
-from rules import is_night_shift, in_interval, min_hours_gap_between_shift
+from rules import is_night_slot, in_interval, min_hours_gap_between_slot
 
 KARKAI_MULTIPLIER = 0.6
 
-shifts_to_place = load_shifts()
+shifts_to_place = load_slots()
 operators = load_operators()
-operators_to_place = [operator for operator in operators if operator.auto_shift]
+operators_to_place = [operator for operator in operators if operator.auto_slot]
 shifts_by_day = {}
 for shift in shifts_to_place:
     if shift.start_time.date() not in shifts_by_day:
@@ -80,7 +80,7 @@ def get_base_model(strict: bool) -> PlacementModel:
     for operator, shifts in placements_by_operator.items():
         for shift in shifts:
             for other_shift in shifts:
-                if shift != other_shift and not min_hours_gap_between_shift(shift, other_shift):
+                if shift != other_shift and not min_hours_gap_between_slot(shift, other_shift):
                     model.Add(
                         placements[Placement(operator, shift)] + placements[Placement(operator, other_shift)] <= 1
                     )
@@ -114,13 +114,13 @@ def get_base_model(strict: bool) -> PlacementModel:
 def get_model_with_configurable_constraints(model: PlacementModel, config: PlacementModelConfig) -> PlacementModel:
     # Add constarint that minimize the amount of nights for each operator.
     night_count = len(
-        [shift for shift in shifts_to_place if is_night_shift(shift)]) / len(
+        [shift for shift in shifts_to_place if is_night_slot(shift)]) / len(
         operators_to_place)
     for operator in operators_to_place:
         night_count_per_op = sum(
             model.placements[Placement(operator, shift)]
             for shift in shifts_to_place if Placement(operator, shift) in model.placements
-            if is_night_shift(shift)
+            if is_night_slot(shift)
         )
         model.model.Add(night_count_per_op <= int(night_count * config.balance_ratio))
         model.model.Add(night_count_per_op >= int(night_count * 1 / config.balance_ratio))
@@ -188,7 +188,7 @@ def print_solution(model: PlacementModel, solver: cp_model.CpSolver):
 
     for operator in operators_to_place:
         print(
-            f"Operator {operator.name} has {sum(solver.Value(model.placements[Placement(operator, shift)]) for shift in shifts_to_place if Placement(operator, shift) in model.placements and is_night_shift(shift))} night shifts")
+            f"Operator {operator.name} has {sum(solver.Value(model.placements[Placement(operator, shift)]) for shift in shifts_to_place if Placement(operator, shift) in model.placements and is_night_slot(shift))} night shifts")
 
     print("''''''''''''''")
     # Number of hours per operator

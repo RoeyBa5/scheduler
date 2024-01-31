@@ -5,7 +5,7 @@ import gspread
 import pandas as pd
 from oauth2client.service_account import ServiceAccountCredentials
 
-from models import Shift, Qualification, Operator, Sector, Constraint
+from models import Slot, Qualification, Operator, Sector, Constraint, Availability
 
 DATE_FORMAT = '%d/%m/%YT%H:%M'
 
@@ -26,11 +26,11 @@ requests_ws = [ws for ws in worksheet if ws.title == 'requests'][0]
 constraints_ws = [ws for ws in worksheet if ws.title == 'constraints'][0]
 
 
-def load_shifts():
+def load_slots():
     shifts = []
     shifts_df = pd.DataFrame(shifts_ws.get_all_records())
     for row in shifts_df.to_dict(orient='records'):
-        shifts.append(Shift(
+        shifts.append(Slot(
             id=uuid.uuid4(),
             start_time=datetime.strptime(f'{row["start_date"]}T{row["start_time"]}', DATE_FORMAT),
             end_time=datetime.strptime(f'{row["end_date"]}T{row["end_time"]}', DATE_FORMAT),
@@ -100,11 +100,15 @@ def load_operators() -> list[Operator]:
             id=row['id'],
             name=row['name'],
             sector=Sector(row['sector']),
+            availabilities=[Availability(
+                start=datetime(2022, 5, 1, 0, 0, 0),
+                end=datetime(2024, 5, 7, 0, 0, 0),
+            )]
         )
         [operator.qualifications.append(qualification) if row[qualification.value] else None
          for qualification in Qualification]
         operators.append(operator)
-        operator.auto_shift = False if row['auto_shift'] == 0 else True
+        operator.auto_slot = False if row['auto_shift'] == 0 else True
     constraints_df = pd.DataFrame(constraints_ws.get_all_records())
     for row in constraints_df.to_dict(orient='records'):
         operator = next(operator for operator in operators if operator.name == row['operator'])

@@ -1,18 +1,18 @@
 from datetime import timedelta
 
-from solver.models import Shift
+from models import Slot
 
 
-def is_night_shift(shift: Shift) -> bool:
+def is_night_slot(shift: Slot) -> bool:
     return shift.start_time.hour >= 22 or shift.start_time.hour <= 6
 
 
-def in_interval(shift: Shift, other_shift: Shift, hours: int) -> bool:
+def in_interval(shift: Slot, other_shift: Slot, hours: int) -> bool:
     return timedelta(hours=0) <= shift.end_time - other_shift.start_time <= timedelta(hours=hours) \
         or timedelta(hours=0) <= other_shift.end_time - shift.start_time <= timedelta(hours=hours)
 
 
-def min_hours_gap_between_shift(shift: Shift, other_shift: Shift) -> bool:
+def min_hours_gap_between_slot(shift: Slot, other_shift: Slot) -> bool:
     # make sure there is no overlap between shifts
     if shift.start_time < other_shift.start_time < shift.end_time:
         return False

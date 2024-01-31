@@ -37,7 +37,7 @@ class Request:
 
 
 @dataclasses.dataclass
-class OtherShift:
+class OtherSlot:
     start: datetime
     end: datetime
 
@@ -68,17 +68,17 @@ class Operator:
     qualifications: list[Qualification] = dataclasses.field(default_factory=list)
     group: Group = Group.SPRINT
     requests: list[Request] = dataclasses.field(default_factory=list)
-    # constraints: list[Constraint] = dataclasses.field(default_factory=list)
+    constraints: list[Constraint] = dataclasses.field(default_factory=list)
     availabilities: list[Availability] = dataclasses.field(default_factory=list)
     # other_shifts: list[OtherShift] = dataclasses.field(default_factory=list)
-    auto_shift: bool = True
+    auto_slot: bool = True
 
     def __hash__(self):
         return hash(self.id)
 
 
 @dataclasses.dataclass
-class Shift:
+class Slot:
     id: uuid.UUID
     start_time: datetime
     end_time: datetime
@@ -93,10 +93,10 @@ class Shift:
 @dataclasses.dataclass
 class Placement:
     operator: Operator
-    shift: Shift
+    slot: Slot
 
     def __hash__(self):
-        return hash((self.operator, self.shift))
+        return hash((self.operator, self.slot))
 
 
 @dataclasses.dataclass
