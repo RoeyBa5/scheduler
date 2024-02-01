@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 
@@ -16,7 +18,7 @@ def create_schedule(schedule: Schedule):
         raise HTTPException(status_code=500, detail="Failed to create schedule")
 
 
-@router.get("/schedules/")
+@router.get("/schedules/", response_model=List[Schedule])
 def get_schedules():
     result = schedule_db.get_schedules()
     if result:
@@ -25,7 +27,7 @@ def get_schedules():
         raise HTTPException(status_code=404, detail="No schedules found")
 
 
-@router.get("/schedules/{schedule_id}")
+@router.get("/schedules/{schedule_id}", response_model=Schedule)
 def get_schedule(schedule_id: str):
     result = schedule_db.get_schedule(schedule_id)
     if result:

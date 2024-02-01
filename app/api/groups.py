@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import HTTPException, Query
 from fastapi.responses import JSONResponse
 
@@ -29,7 +31,8 @@ def remove_group(group_id: str):
         raise HTTPException(status_code=404, detail="Failed to remove group from schedule")
 
 
-@router.get("/groups/")
+# handles both get all groups and get groups of schedule (if passed as query param)
+@router.get("/groups/", response_model=List[Group])
 def get_groups(schedule_id: str = Query(None)):
     result = groups_db.get_groups(schedule_id)
     if result:
@@ -39,7 +42,7 @@ def get_groups(schedule_id: str = Query(None)):
 
 
 @router.get("/groups/{group_id}")
-def get_groups(group_id: str):
+def get_group(group_id: str):
     result = groups_db.get_group(group_id)
     if result:
         return JSONResponse(content=result, media_type="application/json")

@@ -21,9 +21,10 @@ def remove_group(group_id: str):
     return None
 
 
+# handles both get all groups and get groups of schedule
 def get_groups(schedule_id: str):
     if schedule_id:
-        groups = list(collection_groups.find({"schedule_id":schedule_id}))
+        groups = list(collection_groups.find({"schedule_id": schedule_id}))
     else:
         groups = list(collection_groups.find({}))
     return [convert_unserializable(group) for group in groups]

@@ -4,6 +4,7 @@ from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 
 import app.database.operators as operators_db
+import app.database.trainings as trainings_db
 from app.api import router
 from app.models.models import Operator
 
@@ -76,3 +77,37 @@ def delete_all_operators():
         return {'message': 'All operators deleted successfully', 'deleted_count': result.deleted_count}
     else:
         return HTTPException(status_code=404, detail="No operators found")
+
+
+# add <training_id> to <operator_id> list of trainings - get params from query
+@router.post("/operators/add-training/")
+def add_training_to_operator(operator_id: str, training_id: str):
+    operator = operators_db.get_operator(operator_id)
+    training = trainings_db.get_training(training_id)
+    if training and operator:
+        if training_id not in operator.get("trainings_ids", []):
+            result = operators_db.add_training_to_operator(operator_id, training_id)
+            if result.modified_count:
+                return {'message': 'training added successfully', 'modified count': result.modified_count}
+            else:
+                raise HTTPException(status_code=404, detail="Error: training not added")
+        else:
+            raise HTTPException(status_code=404, detail="Training already in operator's trainings list")
+    raise HTTPException(status_code=404, detail="Operator or training ID not valid")
+
+
+# remove <training_id> from <operator_id> list of trainings - get params from query
+@router.post("/operators/remove-training/")
+def remove_training_from_operator(operator_id: str, training_id: str):
+    operator = operators_db.get_operator(operator_id)
+    training = trainings_db.get_training(training_id)
+    if training and operator:
+        if training_id in operator.get("trainings_ids", []):
+            result = operators_db.remove_training_from_operator(operator_id, training_id)
+            if result.modified_count:
+                return {'message': 'training removed successfully', 'modified count': result.modified_count}
+            else:
+                raise HTTPException(status_code=404, detail="Error: training not removed")
+        else:
+            raise HTTPException(status_code=404, detail="Training not found operator's trainings list")
+    raise HTTPException(status_code=404, detail="Operator or training ID not valid")

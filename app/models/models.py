@@ -11,7 +11,7 @@ class Training(BaseModel):
 class Operator(BaseModel):
     id(str)
     name: str
-    trainings: List[Training]
+    trainings_ids: List["str"] = []
 
 
 class Schedule(BaseModel):
@@ -43,7 +43,7 @@ class Shift(BaseModel):
     group_id: Optional[str] = Field(None, alias="group_id_")
     start_time: datetime
     end_time: datetime
-    type_id: str
+    type_id: List["str"] = []
     assigned_operators_ids: List["str"] = []
 
 

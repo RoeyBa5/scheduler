@@ -40,3 +40,14 @@ def delete_operator(operator_id: str):
 
 def delete_all_operators():
     return collection_operators.delete_many({})
+
+
+def add_training_to_operator(operator_id: str, training_id: str):
+    # Add the training_id to the operator's trainings_ids list
+    return collection_operators.update_one({"_id": ObjectId(operator_id)},
+                                           {"$push": {"trainings_ids": training_id}})
+
+
+def remove_training_from_operator(operator_id: str, training_id: str):
+    return collection_operators.update_one({"_id": ObjectId(operator_id)},
+                                           {"$pull": {"trainings_ids": training_id}})
