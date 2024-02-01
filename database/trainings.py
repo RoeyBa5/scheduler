@@ -4,7 +4,7 @@ from database import db
 from models.models import Qualification
 
 collection_trainings = db['trainings']
-
+collection_operators = db['operators']
 
 def create_training(training: Qualification):
     return collection_trainings.insert_one(training.dict())
@@ -27,8 +27,8 @@ def update_training(training_id: str, training: Qualification):
 
 
 def delete_training(training_id: str):
-    return collection_trainings.delete_one({"_id": ObjectId(training_id)})
-
-
-def delete_all_trainings():
-    return collection_trainings.delete_many({})
+    training = collection_trainings.find_one_and_delete({"_id": ObjectId(training_id)})
+    if training:
+        # Remove the training_id from all operators' trainings_ids list
+        collection_operators.update_many({"trainings_ids": training_id}, {"$pull": {"trainings_ids": training_id}})
+    return training
