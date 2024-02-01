@@ -1,0 +1,42 @@
+from typing import List
+
+from bson import ObjectId
+
+from app.database import db
+from app.models.models import Operator
+
+collection_operators = db['operators']
+
+
+def create_operator(operator: Operator):
+    return collection_operators.insert_one(operator.dict())
+
+
+def create_many_operators(operators: List[Operator]):
+    operators_dicts = [operator.dict() for operator in operators]
+    result = collection_operators.insert_many(operators_dicts)
+    return result.inserted_ids
+
+
+def get_operators():
+    operators = list(collection_operators.find({}))
+    # Convert ObjectId to string for serialization
+    for operator in operators:
+        operator['_id'] = str(operator['_id'])
+    return operators
+
+
+def get_operator(operator_id: str):
+    return collection_operators.find_one({"_id": ObjectId(operator_id)})
+
+
+def update_operator(operator_id: str, operator: Operator):
+    return collection_operators.update_one({"_id": ObjectId(operator_id)}, {"$set": operator.dict()})
+
+
+def delete_operator(operator_id: str):
+    return collection_operators.delete_one({"_id": ObjectId(operator_id)})
+
+
+def delete_all_operators():
+    return collection_operators.delete_many({})
