@@ -71,6 +71,8 @@ class Group(BaseModel):
     _id: str
     schedule: Schedule
     name: str
+    start_time: datetime
+    end_time: datetime
 
 
 class Slot(BaseModel):
