@@ -3,9 +3,9 @@ from typing import List
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 
-import database.schedule as schedule_db
 from api import router
 from models.models import Schedule
+import database.schedule as schedule_db
 
 
 # CRUD operations

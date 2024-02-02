@@ -3,9 +3,9 @@ from typing import List
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 
-import app.database.trainings as trainings_db
-from app.api import router
-from app.models.models import Training
+import database.trainings as trainings_db
+from api import router
+from models.models import Training
 
 
 # CRUD operations

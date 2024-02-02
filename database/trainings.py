@@ -1,14 +1,13 @@
 from bson import ObjectId
 
 from database import db
-from models.models import Qualification
+from models.models import Training
 
 collection_trainings = db['trainings']
 collection_operators = db['operators']
 
-def create_training(training: Qualification):
+def create_training(training: Training):
     return collection_trainings.insert_one(training.dict())
-
 
 def get_trainings():
     trainings = list(collection_trainings.find({}))
@@ -22,7 +21,7 @@ def get_training(training_id: str):
     return collection_trainings.find_one({"_id": ObjectId(training_id)})
 
 
-def update_training(training_id: str, training: Qualification):
+def update_training(training_id: str, training: Training):
     return collection_trainings.update_one({"_id": ObjectId(training_id)}, {"$set": training.dict()})
 
 
