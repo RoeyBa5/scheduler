@@ -3,9 +3,9 @@ from typing import List
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 
-import app.database.operators as operators_db
-from app.api import router
-from app.models.models import Operator
+import database.operators as operators_db
+from api import router
+from models.models import Operator
 
 
 @router.get("/")

@@ -3,14 +3,14 @@ from typing import List
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 
-import app.database.trainings as trainings_db
-from app.api import router
-from app.models.models import Training
+import database.trainings as trainings_db
+from api import router
+from models.models import Qualification
 
 
 # CRUD operations
 @router.post("/trainings/")
-def create_training(training: Training):
+def create_training(training: Qualification):
     result = trainings_db.create_training(training)
     if result.inserted_id:
         return {"message": "trainings created successfully", "id": str(result.inserted_id)}
@@ -18,7 +18,7 @@ def create_training(training: Training):
         raise HTTPException(status_code=500, detail="Failed to create trainings")
 
 
-@router.get("/trainings/", response_model=List[Training])
+@router.get("/trainings/", response_model=List[Qualification])
 def get_trainings():
     result = trainings_db.get_trainings()
     if result:
@@ -38,7 +38,7 @@ def get_operator(training_id: str):
 
 
 @router.post("/trainings/{training_id}")
-def update_training(training_id: str, training: Training):
+def update_training(training_id: str, training: Qualification):
     result = trainings_db.update_operator(training_id, training)
     if result.modified_count:
         return {"message": "Training updated successfully"}

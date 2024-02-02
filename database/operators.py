@@ -2,8 +2,8 @@ from typing import List
 
 from bson import ObjectId
 
-from app.database import db
-from app.models.models import Operator
+from database import db
+from models.models import Operator
 
 collection_operators = db['operators']
 

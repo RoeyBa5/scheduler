@@ -1,15 +1,14 @@
-from typing import List
-
 from bson import ObjectId
 
-from app.database import db
-from app.models.models import Training
+from database import db
+from models.models import Qualification
 
 collection_trainings = db['trainings']
 
 
-def create_training(training: Training):
+def create_training(training: Qualification):
     return collection_trainings.insert_one(training.dict())
+
 
 def get_trainings():
     trainings = list(collection_trainings.find({}))
@@ -23,7 +22,7 @@ def get_training(training_id: str):
     return collection_trainings.find_one({"_id": ObjectId(training_id)})
 
 
-def update_training(training_id: str, training: Training):
+def update_training(training_id: str, training: Qualification):
     return collection_trainings.update_one({"_id": ObjectId(training_id)}, {"$set": training.dict()})
 
 

@@ -1,9 +1,10 @@
-from pydantic import BaseModel, Field
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import List, Optional
 
+from pydantic import BaseModel, Field
 
-class Training(BaseModel):
+
+class Qualification(BaseModel):
     id(str)
     name: str
 
@@ -11,7 +12,7 @@ class Training(BaseModel):
 class Operator(BaseModel):
     id(str)
     name: str
-    trainings: List[Training]
+    trainings: List[Qualification]
 
 
 class Schedule(BaseModel):
@@ -47,8 +48,6 @@ class Shift(BaseModel):
     assigned_operators_ids: List["str"] = []
 
 
-
-
 # # a slot is uniquely described by a set: schedule_id, group_id, shift, training
 # class Slot(BaseModel):
 #     id(str)
@@ -59,3 +58,55 @@ class Shift(BaseModel):
 #     start_time: datetime
 #     end_time: datetime
 #     assigned_operator: Operator = None
+"""
+class Schedule(BaseModel):
+    _id: str
+    name: str
+    start_time: datetime
+    end_time: datetime
+    is_generated: bool
+
+
+class Group(BaseModel):
+    _id: str
+    schedule: Schedule
+    name: str
+
+
+class Slot(BaseModel):
+    _id: str
+    operator: Operator | None
+    qualification: Qualification
+
+
+class Shift(BaseModel):
+    _id: str
+    # foreign key to group
+    group: Group
+    start_time: datetime
+    end_time: datetime
+    slots: list[Slot]
+
+
+class Operator(BaseModel):
+    name: str
+    qualifications: list[Qualification]
+
+
+class Availability(BaseModel):
+    _id: str
+    schedule: Schedule
+    operator: Operator
+    start_time: datetime
+    end_time: datetime
+
+
+class Request(BaseModel):
+    _id: str
+    schedule: Schedule
+    operator: Operator
+    start_time: datetime
+    end_time: datetime
+    description: str
+    score: int
+"""
