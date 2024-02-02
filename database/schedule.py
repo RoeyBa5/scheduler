@@ -1,10 +1,10 @@
 from bson import ObjectId
 
-from database import db
+from database import collection_schedules
 from models.models import Schedule
+import database.groups as groups_db
 
-collection_schedules = db['schedules']
-collection_groups = db['groups']
+# collection_schedules = db['schedules']
 
 
 def create_schedule(schedule: Schedule):
@@ -25,7 +25,10 @@ def get_schedule(schedule_id: str):
 
 def delete_schedule(schedule_id: str):
     schedule = collection_schedules.find_one_and_delete({"_id": ObjectId(schedule_id)})
-    return collection_groups.delete_many({"schedule_id": schedule_id})
+    if schedule:
+        for group_id in schedule['groups_ids']:
+            groups_db.delete_group(group_id)
+    return schedule
 
 
 # converts unserializable fields of schedule to str
@@ -33,5 +36,5 @@ def convert_unserializable(schedule):
     schedule['_id'] = str(schedule['_id'])
     schedule['start_time'] = str(schedule['start_time'])
     schedule['end_time'] = str(schedule['end_time'])
-    schedule['group_ids'] = [str(group_id) for group_id in schedule['group_ids']]
+    schedule['groups_ids'] = [str(group_id) for group_id in schedule['groups_ids']]
     return schedule

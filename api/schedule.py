@@ -39,7 +39,7 @@ def get_schedule(schedule_id: str):
 @router.delete("/schedules/delete/{schedule_id}")
 def delete_schedule(schedule_id: str):
     result = schedule_db.delete_schedule(schedule_id)
-    if result.deleted_count:
+    if result:
         return {"message": "Schedule deleted successfully"}
     else:
         raise HTTPException(status_code=404, detail="schedule not found")

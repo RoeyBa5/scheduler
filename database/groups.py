@@ -1,23 +1,27 @@
 from bson import ObjectId
 
-from database import db
-from database.schedule import collection_schedules
+from database import collection_groups
+from database import collection_schedules
+from database import collection_shifts
 
-collection_groups = db['groups']
-
+# collection_groups = db['groups']
 
 def add_group(group):
     result = collection_groups.insert_one(group.dict())
     return collection_schedules.update_one({"_id": ObjectId(group.schedule_id)},
-                                           {"$push": {"group_ids": ObjectId(result.inserted_id)}}), result.inserted_id
+                                           {"$push": {"groups_ids": ObjectId(result.inserted_id)}}), result.inserted_id
 
 
-def remove_group(group_id: str):
-    # remove group from schedule where schedule_id = result.schedule_id
+def delete_group(group_id: str):
     group = collection_groups.find_one_and_delete({"_id": ObjectId(group_id)})
     if group:
+        # collection_shifts.delete_many({"group_id": group_id})
+        shifts_to_delete = group['shifts_ids']
+        for shift_id in shifts_to_delete:
+            collection_shifts.delete_one({"_id": shift_id})
+
         return collection_schedules.update_one({"_id": ObjectId(group['schedule_id'])},
-                                               {"$pull": {"group_ids": ObjectId(group_id)}})
+                                               {"$pull": {"groups_ids": ObjectId(group_id)}})
     return None
 
 
@@ -33,6 +37,10 @@ def get_groups(schedule_id: str):
 def get_group(group_id: str):
     group = collection_groups.find_one({"_id": ObjectId(group_id)})
     return convert_unserializable(group)
+
+
+def rename_group(group_id: str, new_name: str):
+    return collection_groups.update_one({"_id": ObjectId(group_id)}, {"$set": {"name": new_name}})
 
 
 # converts unserializable fields of group to str
