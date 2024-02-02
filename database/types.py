@@ -1,8 +1,7 @@
 from bson import ObjectId
 
-from app.database import db
-from app.database.schedule import collection_schedules
-from app.models.models import Type
+from database import db
+from models.models import Type
 
 collection_types = db['types']
 collection_shifts = db['shifts']

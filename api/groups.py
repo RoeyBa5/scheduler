@@ -3,10 +3,10 @@ from typing import List
 from fastapi import HTTPException, Query
 from fastapi.responses import JSONResponse
 
-import app.database.groups as groups_db
-import app.database.schedule as schedule_db
-from app.api import router
-from app.models.models import Group
+import database.groups as groups_db
+import database.schedule as schedule_db
+from api import router
+from models.models import Group
 
 
 @router.post("/groups/add/")

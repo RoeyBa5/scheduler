@@ -2,9 +2,9 @@
 
 from bson import ObjectId
 
-from app.database import db
-import app.database.groups as groups_db
-from app.models.models import Shift
+from database import db
+import database.groups as groups_db
+from models.models import Shift
 
 collection_shifts = db['shifts']
 

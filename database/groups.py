@@ -1,7 +1,7 @@
 from bson import ObjectId
 
-from app.database import db
-from app.database.schedule import collection_schedules
+from database import db
+from database.schedule import collection_schedules
 
 collection_groups = db['groups']
 

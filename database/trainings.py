@@ -1,9 +1,7 @@
-from typing import List
-
 from bson import ObjectId
 
-from app.database import db
-from app.models.models import Training
+from database import db
+from models.models import Training
 
 collection_trainings = db['trainings']
 collection_operators = db['operators']

@@ -1,11 +1,11 @@
 from typing import List
 
-from fastapi import HTTPException, Query
+from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 
-import app.database.types as types_db
-from app.api import router
-from app.models.models import Type
+import database.types as types_db
+from api import router
+from models.models import Type
 
 
 @router.post("/types/create/")

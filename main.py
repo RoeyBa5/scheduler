@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 
-from app.api import operators, trainings, schedule, groups, types, shifts
+from api import operators, types, shifts
+from api import trainings, schedule, groups
 
 app = FastAPI()
 
