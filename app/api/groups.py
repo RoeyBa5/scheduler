@@ -48,3 +48,6 @@ def get_group(group_id: str):
         return JSONResponse(content=result, media_type="application/json")
     else:
         raise HTTPException(status_code=404, detail="No group found with given id")
+
+# @router.post("/group/")
+# def update_group(group: Group):

@@ -3,48 +3,52 @@ from typing import List
 from fastapi import HTTPException, Query
 from fastapi.responses import JSONResponse
 
-import app.database.groups as groups_db
-import app.database.schedule as schedule_db
+import app.database.types as types_db
 from app.api import router
-from app.models.models import Group
+from app.models.models import Type
 
 
-@router.post("/groups/add/")
-def add_group(group: Group):
-    schedule_exists = schedule_db.get_schedule(group.schedule_id)
-    if schedule_exists:
-        result, inserted_group_id = groups_db.add_group(group)
-        if result.modified_count:
-            return {"message": "Group added successfully", "group_id": str(inserted_group_id)}
-        else:
-            raise HTTPException(status_code=404, detail="Failed to add group to schedule")
+@router.post("/types/create/")
+def add_type(type: Type):
+    result = types_db.add_type(type)
+    if result.inserted_id:
+        return {"message": "Type added successfully", "type_id": str(result.inserted_id)}
     else:
-        raise HTTPException(status_code=404, detail=f"Failed to add find schedule with id {group.schedule_id}")
+        raise HTTPException(status_code=404, detail="Failed to add type")
 
 
-@router.delete("/groups/remove/{group_id}")
-def remove_group(group_id: str):
-    result = groups_db.remove_group(group_id)
+@router.delete("/types/delete/{type_id}")
+def delete_type(type_id: str):
+    result = types_db.delete_type(type_id)
     if result:
-        return {"message": "Group deleted successfully"}
+        return {"message": "Type deleted successfully"}
     else:
-        raise HTTPException(status_code=404, detail="Failed to remove group from schedule")
+        raise HTTPException(status_code=404, detail="No type found with given ID to delete")
 
 
-# handles both get all groups and get groups of schedule (if passed as query param)
-@router.get("/groups/", response_model=List[Group])
-def get_groups(schedule_id: str = Query(None)):
-    result = groups_db.get_groups(schedule_id)
-    if result:
-        return JSONResponse(content=result, media_type="application/json")
+@router.post("/types/{type_id}")
+def update_type(type_id: str, type: Type):
+    result = types_db.update_type(type_id, type)
+    if result.modified_count:
+        return {"message": "Type updated successfully"}
     else:
-        raise HTTPException(status_code=404, detail="No groups found")
+        raise HTTPException(status_code=404, detail="Type not found")
 
 
-@router.get("/groups/{group_id}")
-def get_group(group_id: str):
-    result = groups_db.get_group(group_id)
+@router.get("/types/", response_model=List[Type])
+def get_types():
+    result = types_db.get_types()
     if result:
         return JSONResponse(content=result, media_type="application/json")
     else:
-        raise HTTPException(status_code=404, detail="No group found with given id")
+        raise HTTPException(status_code=404, detail="No types found")
+
+
+@router.get("/types/{type_id}", response_model=Type)
+def get_type(type_id: str):
+    result = types_db.get_type(type_id)
+    if result:
+        result['_id'] = str(result['_id'])
+        return JSONResponse(content=result, media_type="application/json")
+    else:
+        raise HTTPException(status_code=404, detail="No type found with given ID")

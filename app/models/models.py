@@ -24,7 +24,7 @@ class Schedule(BaseModel):
 # a group (moked) is uniquely described by the triplet: schedule_id, name, date
 class Group(BaseModel):
     id(str)
-    schedule_id: Optional[str] = Field(None, alias="schedule_id_")
+    schedule_id: str = Field(..., alias="schedule_id_")
     name: str
     start_time: datetime
     end_time: datetime
@@ -39,11 +39,10 @@ class Type(BaseModel):
 
 class Shift(BaseModel):
     id(str)
-    schedule_id: Optional[str] = Field(None, alias="schedule_id_")
-    group_id: Optional[str] = Field(None, alias="group_id_")
+    group_id: str = Field(..., alias="group_id_")
     start_time: datetime
     end_time: datetime
-    type_id: List["str"] = []
+    type_id: str
     assigned_operators_ids: List["str"] = []
 
 
