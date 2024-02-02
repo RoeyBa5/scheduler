@@ -21,7 +21,7 @@ def create_operator(operator: Operator):
     if result.inserted_id:
         return {"message": "Operator created successfully", "id": str(result.inserted_id)}
     else:
-        raise HTTPException(status_code=500, detail="Failed to create operator")
+        raise HTTPException(status_code=404, detail="Failed to create operator")
 
 
 @router.post("/operators/create")
@@ -30,7 +30,7 @@ def create_operators(operators: List[Operator]):
     if result:
         return {"message": "Operator created successfully", "ids": str(result)}
     else:
-        raise HTTPException(status_code=500, detail="Failed to create operator")
+        raise HTTPException(status_code=404, detail="Failed to create operator")
 
 
 @router.get("/operators/", response_model=List[Operator])
@@ -70,10 +70,10 @@ def delete_operator(operator_id: str):
         raise HTTPException(status_code=404, detail="Operator not found")
 
 
-@router.delete("/operators/delete")
+@router.delete("/operators/delete-all/")
 def delete_all_operators():
     result = operators_db.delete_all_operators()
-    if result:
+    if result.deleted_count:
         return {'message': 'All operators deleted successfully', 'deleted_count': result.deleted_count}
     else:
         return HTTPException(status_code=404, detail="No operators found")

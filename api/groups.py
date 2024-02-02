@@ -19,16 +19,16 @@ def add_group(group: Group):
         else:
             raise HTTPException(status_code=404, detail="Failed to add group to schedule")
     else:
-        raise HTTPException(status_code=404, detail=f"Failed to add find schedule with id {group.schedule_id}")
+        raise HTTPException(status_code=404, detail=f"Failed to find schedule with id {group.schedule_id}")
 
 
-@router.delete("/groups/remove/{group_id}")
+@router.delete("/groups/delete/{group_id}")
 def remove_group(group_id: str):
-    result = groups_db.remove_group(group_id)
+    result = groups_db.delete_group(group_id)
     if result:
         return {"message": "Group deleted successfully"}
     else:
-        raise HTTPException(status_code=404, detail="Failed to remove group from schedule")
+        raise HTTPException(status_code=404, detail="No group found with given ID to delete")
 
 
 # handles both get all groups and get groups of schedule (if passed as query param)
@@ -49,5 +49,12 @@ def get_group(group_id: str):
     else:
         raise HTTPException(status_code=404, detail="No group found with given id")
 
-# @router.post("/group/")
-# def update_group(group: Group):
+
+# group id as path param, new_name as query param
+@router.post("/groups/rename/{group_id}")
+def update_group(group_id: str, new_name: str):
+    result = groups_db.rename_group(group_id, new_name)
+    if result:
+        return {"message": "Group renamed successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="No group found with given id")

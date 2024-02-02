@@ -1,29 +1,32 @@
+from datetime import datetime
+from typing import List
+
 from pydantic import BaseModel, Field
-from datetime import datetime, timedelta
-from typing import List, Optional
 
 
 class Training(BaseModel):
-    id(str)
+    _id: str
     name: str
 
 
 class Operator(BaseModel):
-    id(str)
+    _id: str
     name: str
     trainings_ids: List["str"] = []
 
 
 class Schedule(BaseModel):
-    id(str)
+    _id: str
+    name: str
     start_time: datetime  # Time can store date value as YYYY-MM-DD
     end_time: datetime
-    group_ids: List["str"] = []
+    groups_ids: List["str"] = []
+    is_generated: bool = False
 
 
 # a group (moked) is uniquely described by the triplet: schedule_id, name, date
 class Group(BaseModel):
-    id(str)
+    _id: str
     schedule_id: str = Field(..., alias="schedule_id_")
     name: str
     start_time: datetime
@@ -32,20 +35,17 @@ class Group(BaseModel):
 
 
 class Type(BaseModel):
-    id(str)
+    _id: str
     name: str
     num_of_operators: int
 
 
 class Shift(BaseModel):
-    id(str)
+    _id: str
     group_id: str = Field(..., alias="group_id_")
     start_time: datetime
     end_time: datetime
-    type_id: str
-    assigned_operators_ids: List["str"] = []
-
-
+    assignment: dict  # key : training_id, value: operator_id
 
 
 # # a slot is uniquely described by a set: schedule_id, group_id, shift, training
