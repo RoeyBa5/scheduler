@@ -48,6 +48,23 @@ class Shift(BaseModel):
     assignment: dict  # key : training_id, value: operator_id
 
 
+class Availability(BaseModel):
+    _id: str
+    schedule_id: str
+    operator_id: str
+    start_time: datetime
+    end_time: datetime
+
+
+class Request(BaseModel):
+    _id: str
+    schedule_id: str = Field(..., alias="schedule_id_")
+    operator_id: str = Field(..., alias="operator_id_")
+    start_time: datetime
+    end_time: datetime
+    description: str
+    score: int
+
 # # a slot is uniquely described by a set: schedule_id, group_id, shift, training
 # class Slot(BaseModel):
 #     id(str)

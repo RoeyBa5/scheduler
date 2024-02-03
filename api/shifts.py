@@ -1,5 +1,3 @@
-# api/shifts.py
-
 from typing import List
 
 from fastapi import HTTPException, Query

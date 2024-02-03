@@ -9,7 +9,7 @@ from api import router
 from models.models import Group
 
 
-@router.post("/groups/add/")
+@router.post("/groups/create/")
 def add_group(group: Group):
     schedule_exists = schedule_db.get_schedule(group.schedule_id)
     if schedule_exists:
