@@ -51,3 +51,7 @@ def convert_unserializable(availability):
         availability['start_time'] = str(availability['start_time'])
         availability['end_time'] = str(availability['end_time'])
     return availability
+
+
+def delete_all():
+    return collection_availabilities.delete_many({})

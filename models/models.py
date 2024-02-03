@@ -58,8 +58,8 @@ class Availability(BaseModel):
 
 class Request(BaseModel):
     _id: str
-    schedule_id: str = Field(..., alias="schedule_id_")
-    operator_id: str = Field(..., alias="operator_id_")
+    schedule_id: str
+    operator_id: str
     start_time: datetime
     end_time: datetime
     description: str

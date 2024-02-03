@@ -4,6 +4,7 @@ from bson import ObjectId
 
 from database import collection_operators
 import database.availabilities as availabilities_db
+import database.requests as requests_db
 from models.models import Operator
 
 
@@ -35,11 +36,16 @@ def update_operator(operator_id: str, operator: Operator):
 def delete_operator(operator_id: str):
     result = collection_operators.delete_one({"_id": ObjectId(operator_id)})
     availabilities_db.delete_availabilities_after_deletion(operator_id=operator_id)
+    requests_db.delete_requests_after_deletion(operator_id=operator_id)
     return result
 
 
 def delete_all_operators():
-    return collection_operators.delete_many({})
+    result = collection_operators.delete_many({})
+    if result.deleted_count:
+        availabilities_db.delete_all()
+        requests_db.delete_all()
+    return result
 
 
 def add_training_to_operator(operator_id: str, training_id: str):
