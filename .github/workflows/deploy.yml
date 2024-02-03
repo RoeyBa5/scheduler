@@ -1,8 +1,8 @@
 name: deploy
-
-on:
-  push:
-    branches: [ main ]
+run-name: deploy
+#on:
+#  push:
+#    branches: [ main ]
 
 jobs:
   deploy:
