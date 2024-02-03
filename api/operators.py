@@ -10,7 +10,7 @@ from models.models import Operator
 
 @router.get("/")
 def read_root():
-    return {"message": "Hello World"}
+    return {"message": "Hello World V2"}
 
 
 # CRUD operations
