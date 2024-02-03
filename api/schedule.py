@@ -9,7 +9,7 @@ import database.schedule as schedule_db
 
 
 # CRUD operations
-@router.post("/schedules/")
+@router.post("/schedules/create")
 def create_schedule(schedule: Schedule):
     result = schedule_db.create_schedule(schedule)
     if result.inserted_id:

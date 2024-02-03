@@ -9,7 +9,7 @@ from models.models import Training
 
 
 # CRUD operations
-@router.post("/trainings/")
+@router.post("/trainings/create/")
 def create_training(training: Training):
     result = trainings_db.create_training(training)
     if result.inserted_id:

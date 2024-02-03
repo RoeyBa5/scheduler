@@ -4,6 +4,7 @@ from database import collection_groups
 from database import collection_schedules
 from database import collection_shifts
 
+
 # collection_groups = db['groups']
 
 def add_group(group):

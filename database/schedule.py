@@ -1,8 +1,10 @@
 from bson import ObjectId
 
 from database import collection_schedules
+
 from models.models import Schedule
 import database.groups as groups_db
+import database.availabilities as availabilities_db
 
 # collection_schedules = db['schedules']
 
@@ -28,6 +30,7 @@ def delete_schedule(schedule_id: str):
     if schedule:
         for group_id in schedule['groups_ids']:
             groups_db.delete_group(group_id)
+        availabilities_db.delete_availabilities_after_deletion(schedule_id=schedule_id)
     return schedule
 
 

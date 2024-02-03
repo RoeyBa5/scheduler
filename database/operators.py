@@ -2,10 +2,9 @@ from typing import List
 
 from bson import ObjectId
 
-from database import db
+from database import collection_operators
+import database.availabilities as availabilities_db
 from models.models import Operator
-
-collection_operators = db['operators']
 
 
 def create_operator(operator: Operator):
@@ -20,7 +19,6 @@ def create_many_operators(operators: List[Operator]):
 
 def get_operators():
     operators = list(collection_operators.find({}))
-    # Convert ObjectId to string for serialization
     for operator in operators:
         operator['_id'] = str(operator['_id'])
     return operators
@@ -35,7 +33,9 @@ def update_operator(operator_id: str, operator: Operator):
 
 
 def delete_operator(operator_id: str):
-    return collection_operators.delete_one({"_id": ObjectId(operator_id)})
+    result = collection_operators.delete_one({"_id": ObjectId(operator_id)})
+    availabilities_db.delete_availabilities_after_deletion(operator_id=operator_id)
+    return result
 
 
 def delete_all_operators():

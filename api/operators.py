@@ -9,13 +9,8 @@ from api import router
 from models.models import Operator
 
 
-@router.get("/")
-def read_root():
-    return {"message": "Hello World"}
-
-
 # CRUD operations
-@router.post("/operators/")
+@router.post("/operators/create/")
 def create_operator(operator: Operator):
     result = operators_db.create_operator(operator)
     if result.inserted_id:
@@ -24,11 +19,11 @@ def create_operator(operator: Operator):
         raise HTTPException(status_code=404, detail="Failed to create operator")
 
 
-@router.post("/operators/create")
+@router.post("/operators/create-many/")
 def create_operators(operators: List[Operator]):
     result = operators_db.create_many_operators(operators)
     if result:
-        return {"message": "Operator created successfully", "ids": str(result)}
+        return {"message": "Operators created successfully", "ids": str(result)}
     else:
         raise HTTPException(status_code=404, detail="Failed to create operator")
 
