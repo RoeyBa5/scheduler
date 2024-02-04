@@ -1,8 +1,8 @@
 from bson import ObjectId
 
-from database import collection_groups
-from database import collection_schedules
-from database import collection_shifts
+from repository import collection_groups
+from repository import collection_schedules
+from repository import collection_shifts
 
 
 # collection_groups = db['groups']

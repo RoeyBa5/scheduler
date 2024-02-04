@@ -1,9 +1,9 @@
 from bson import ObjectId
 
-from database import db
+from repository import db
 from models.models import Shift
-from database import collection_groups
-from database import collection_shifts
+from repository import collection_groups
+from repository import collection_shifts
 # collection_shifts = db['shifts']
 
 

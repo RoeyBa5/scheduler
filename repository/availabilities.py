@@ -1,6 +1,6 @@
 from bson import ObjectId
 
-from database import collection_availabilities
+from repository import collection_availabilities
 from models.models import Availability
 
 """
@@ -12,21 +12,11 @@ db integrity:
 
 
 # Schedule and operator ids are optional
-def get_availabilities(schedule_id: str, operator_id: str):
-    if schedule_id:
-        if operator_id:
-            # schedule and operator
-            result = collection_availabilities.find(
-                {"schedule_id": schedule_id, "operator_id": operator_id})
-        else:
-            # only schedule
-            result = collection_availabilities.find({"schedule_id": schedule_id})
-    elif operator_id:
-        # only operator
-        result = collection_availabilities.find({"operator_id": operator_id})
-    else:
-        # neither
-        result = collection_availabilities.find({})
+def get_availabilities(schedule_id: str = None, operator_id: str = None):
+    query = {}
+    query.update({"schedule_id": schedule_id} if schedule_id else {})
+    query.update({"operator_id": operator_id} if operator_id else {})
+    result = collection_availabilities.find(query)
     return [convert_unserializable(res) for res in list(result)]
 
 
@@ -38,7 +28,7 @@ def delete_availability(availability_id: str):
     return collection_availabilities.delete_one({"_id": ObjectId(availability_id)})
 
 
-def delete_availabilities_after_deletion(schedule_id: str = "", operator_id: str = ""):
+def delete_availabilities_after_deletion(schedule_id: str = None, operator_id: str = None):
     if schedule_id:
         return collection_availabilities.delete_many({"schedule_id": schedule_id})
     return collection_availabilities.delete_many({"operator_id": operator_id})

@@ -3,7 +3,7 @@ from typing import List
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 
-import database.types as types_db
+import repository.types as types_db
 from api import router
 from models.models import Type
 

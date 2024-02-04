@@ -3,8 +3,8 @@ from typing import List
 from fastapi import HTTPException, Query
 from fastapi.responses import JSONResponse
 
-import database.shifts as shifts_db
-import database.groups as groups_db
+import repository.shifts as shifts_db
+import repository.groups as groups_db
 from api import router
 from models.models import Shift
 
