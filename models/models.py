@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import List
 
+from bson import ObjectId
 from pydantic import BaseModel, Field
 
 
@@ -27,7 +28,7 @@ class Schedule(BaseModel):
 # a group (moked) is uniquely described by the triplet: schedule_id, name, date
 class Group(BaseModel):
     _id: str
-    schedule_id: str = Field(..., alias="schedule_id_")
+    schedule_id: str
     name: str
     start_time: datetime
     end_time: datetime

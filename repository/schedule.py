@@ -1,11 +1,14 @@
 from bson import ObjectId
 
 from repository import collection_schedules
+from repository import collection_groups
 
 from models.models import Schedule
 import repository.groups as groups_db
 import repository.availabilities as availabilities_db
 import repository.requests as requests_db
+
+
 # collection_schedules = db['schedules']
 
 
@@ -35,6 +38,24 @@ def delete_schedule(schedule_id: str):
     return schedule
 
 
+# get full schedule object:
+# if generated - get all groups and shifts
+# if not - get all workers data
+def get_schedule_object(schedule_id: str):
+    schedule = collection_schedules.find_one({"_id": ObjectId(schedule_id)})
+    if schedule['is_generated']:
+        result = list(collection_groups.aggregate([
+            {"$match": {"schedule_id": schedule_id}},
+            {"$lookup": {
+                "from": "shifts",
+                "localField": "shifts_ids",
+                "foreignField": "_id",
+                "as": "shifts"}}
+        ]))
+        schedule['groups'] = result
+        # need to serialize
+    return schedule
+
 # converts unserializable fields of schedule to str
 def convert_unserializable(schedule):
     schedule['_id'] = str(schedule['_id'])
@@ -42,3 +63,10 @@ def convert_unserializable(schedule):
     schedule['end_time'] = str(schedule['end_time'])
     schedule['groups_ids'] = [str(group_id) for group_id in schedule['groups_ids']]
     return schedule
+
+
+def generate_schedule(schedule_id: str):
+    result = collection_schedules.update_one({"_id": ObjectId(schedule_id)}, {"$set": {"is_generated": True}})
+    if result.modified_count:
+        return result
+    return collection_schedules.update_one({"_id": ObjectId(schedule_id)}, {"$set": {"is_generated": False}})
