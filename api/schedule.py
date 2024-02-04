@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 
 from api import router
 from models.models import Schedule
-import database.schedule as schedule_db
+import repository.schedule as schedule_db
 
 
 # CRUD operations

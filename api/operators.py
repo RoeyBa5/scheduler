@@ -3,8 +3,8 @@ from typing import List
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 
-import database.operators as operators_db
-import database.trainings as trainings_db
+import repository.operators as operators_db
+import repository.trainings as trainings_db
 from api import router
 from models.models import Operator
 

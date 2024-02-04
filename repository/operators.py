@@ -2,9 +2,9 @@ from typing import List
 
 from bson import ObjectId
 
-from database import collection_operators
-import database.availabilities as availabilities_db
-import database.requests as requests_db
+from repository import collection_operators
+import repository.availabilities as availabilities_db
+import repository.requests as requests_db
 from models.models import Operator
 
 

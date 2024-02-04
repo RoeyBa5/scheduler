@@ -3,8 +3,8 @@ from typing import List
 from fastapi import HTTPException, Query
 from fastapi.responses import JSONResponse
 
-import database.groups as groups_db
-import database.schedule as schedule_db
+import repository.groups as groups_db
+import repository.schedule as schedule_db
 from api import router
 from models.models import Group
 

@@ -1,25 +1,15 @@
 from bson import ObjectId
 
-from database import collection_requests
+from repository import collection_requests
 from models.models import Request
 
 
 # Schedule and operator ids are optional
-def get_requests(schedule_id: str, operator_id: str):
-    if schedule_id:
-        if operator_id:
-            # schedule and operator
-            result = collection_requests.find(
-                {"schedule_id": schedule_id, "operator_id": operator_id})
-        else:
-            # only schedule
-            result = collection_requests.find({"schedule_id": schedule_id})
-    elif operator_id:
-        # only operator
-        result = collection_requests.find({"operator_id": operator_id})
-    else:
-        # neither
-        result = collection_requests.find({})
+def get_requests(schedule_id: str = None, operator_id: str = None):
+    query = {}
+    query.update({"schedule_id": schedule_id} if schedule_id else {})
+    query.update({"operator_id": operator_id} if operator_id else {})
+    result = collection_requests.find(query)
     return [convert_unserializable(res) for res in list(result)]
 
 
@@ -35,7 +25,7 @@ def delete_request(request_id: str):
     return collection_requests.delete_one({"_id": ObjectId(request_id)})
 
 
-def delete_requests_after_deletion(schedule_id: str = "", operator_id: str = ""):
+def delete_requests_after_deletion(schedule_id: str = None, operator_id: str = None):
     if schedule_id:
         return collection_requests.delete_many({"schedule_id": schedule_id})
     return collection_requests.delete_many({"operator_id": operator_id})

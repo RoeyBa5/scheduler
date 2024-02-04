@@ -1,11 +1,11 @@
 from bson import ObjectId
 
-from database import collection_schedules
+from repository import collection_schedules
 
 from models.models import Schedule
-import database.groups as groups_db
-import database.availabilities as availabilities_db
-import database.requests as requests_db
+import repository.groups as groups_db
+import repository.availabilities as availabilities_db
+import repository.requests as requests_db
 # collection_schedules = db['schedules']
 
 

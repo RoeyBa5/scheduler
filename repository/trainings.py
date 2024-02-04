@@ -1,6 +1,6 @@
 from bson import ObjectId
 
-from database import db
+from repository import db
 from models.models import Training
 
 collection_trainings = db['trainings']
