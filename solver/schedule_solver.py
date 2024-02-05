@@ -4,8 +4,8 @@ import pandas as pd
 from ortools.sat.python import cp_model
 
 from data_loader import load_slots, load_operators
-from models import Placement, Group, PlacementModel, PlacementModelConfig, Qualification
-from models import Slot, Operator
+from temp_models import Placement, Group, PlacementModel, PlacementModelConfig, Qualification
+from temp_models import Slot, Operator
 from rules import is_night_slot, in_interval, min_hours_gap_between_slot
 
 KARKAI_MULTIPLIER = 0.6

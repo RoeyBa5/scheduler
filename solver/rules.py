@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from models import Slot
+from temp_models import Slot
 
 
 def is_night_slot(shift: Slot) -> bool:

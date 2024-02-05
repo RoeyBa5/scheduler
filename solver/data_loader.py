@@ -5,7 +5,7 @@ import gspread
 import pandas as pd
 from oauth2client.service_account import ServiceAccountCredentials
 
-from models import Slot, Qualification, Operator, Sector, Constraint, Availability
+from temp_models import Slot, Qualification, Operator, Sector, Constraint, Availability
 
 DATE_FORMAT = '%d/%m/%YT%H:%M'
 
