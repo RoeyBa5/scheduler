@@ -2,11 +2,13 @@ from bson import ObjectId
 
 from repository import collection_schedules
 from repository import collection_groups
+from repository import collection_availabilities
 
 from models.models import Schedule
 import repository.groups as groups_db
 import repository.availabilities as availabilities_db
 import repository.requests as requests_db
+import repository.shifts as shifts_db
 
 
 # collection_schedules = db['schedules']
@@ -44,7 +46,7 @@ def delete_schedule(schedule_id: str):
 def get_schedule_object(schedule_id: str):
     schedule = collection_schedules.find_one({"_id": ObjectId(schedule_id)})
     if schedule['is_generated']:
-        result = list(collection_groups.aggregate([
+        groups = list(collection_groups.aggregate([
             {"$match": {"schedule_id": schedule_id}},
             {"$lookup": {
                 "from": "shifts",
@@ -52,9 +54,12 @@ def get_schedule_object(schedule_id: str):
                 "foreignField": "_id",
                 "as": "shifts"}}
         ]))
-        schedule['groups'] = result
-        # need to serialize
-    return schedule
+
+        schedule['groups'] = convert_groups_object_serializable(groups)
+        return convert_unserializable(schedule)
+    else:
+        return availabilities_db.get_availabilities(schedule_id)
+
 
 # converts unserializable fields of schedule to str
 def convert_unserializable(schedule):
@@ -64,6 +69,8 @@ def convert_unserializable(schedule):
     schedule['groups_ids'] = [str(group_id) for group_id in schedule['groups_ids']]
     return schedule
 
+def convert_groups_object_serializable(groups):
+    return [[shifts_db.convert_unserializable(shift) for shift in group['shifts']] for group in groups]
 
 def generate_schedule(schedule_id: str):
     result = collection_schedules.update_one({"_id": ObjectId(schedule_id)}, {"$set": {"is_generated": True}})

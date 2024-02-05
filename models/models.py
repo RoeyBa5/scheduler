@@ -43,7 +43,7 @@ class Type(BaseModel):
 
 class Shift(BaseModel):
     _id: str
-    group_id: str = Field(..., alias="group_id_")
+    group_id: str
     start_time: datetime
     end_time: datetime
     assignment: dict  # key : training_id, value: operator_id
