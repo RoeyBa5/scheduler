@@ -1,17 +1,12 @@
 from bson import ObjectId
 
-from repository import collection_schedules
-from repository import collection_groups
-from repository import collection_availabilities
-
-from models.models import Schedule
-import repository.groups as groups_db
 import repository.availabilities as availabilities_db
+import repository.groups as groups_db
 import repository.requests as requests_db
 import repository.shifts as shifts_db
-
-
-# collection_schedules = db['schedules']
+from models.models import Schedule
+from repository import collection_groups
+from repository import collection_schedules
 
 
 def create_schedule(schedule: Schedule):
@@ -69,8 +64,15 @@ def convert_unserializable(schedule):
     schedule['groups_ids'] = [str(group_id) for group_id in schedule['groups_ids']]
     return schedule
 
+
 def convert_groups_object_serializable(groups):
-    return [[shifts_db.convert_unserializable(shift) for shift in group['shifts']] for group in groups]
+    groups = [groups_db.convert_unserializable(group) for group in groups]
+    groups = [{
+        **group,
+        "shifts": [shifts_db.convert_unserializable(shift) for shift in group['shifts']]
+    } for group in groups]
+    return groups
+
 
 def generate_schedule(schedule_id: str):
     result = collection_schedules.update_one({"_id": ObjectId(schedule_id)}, {"$set": {"is_generated": True}})
