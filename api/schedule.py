@@ -1,13 +1,15 @@
+from typing import List
+
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 
-import database.schedule as schedule_db
 from api import router
 from models.models import Schedule
+import repository.schedule as schedule_db
 
 
 # CRUD operations
-@router.post("/schedules/")
+@router.post("/schedules/create")
 def create_schedule(schedule: Schedule):
     result = schedule_db.create_schedule(schedule)
     if result.inserted_id:
@@ -16,7 +18,7 @@ def create_schedule(schedule: Schedule):
         raise HTTPException(status_code=500, detail="Failed to create schedule")
 
 
-@router.get("/schedules/")
+@router.get("/schedules/", response_model=List[Schedule])
 def get_schedules():
     result = schedule_db.get_schedules()
     if result:
@@ -25,9 +27,16 @@ def get_schedules():
         raise HTTPException(status_code=404, detail="No schedules found")
 
 
-@router.get("/schedules/{schedule_id}")
+@router.get("/schedules/{schedule_id}", response_model=Schedule)
 def get_schedule(schedule_id: str):
     result = schedule_db.get_schedule(schedule_id)
+    if result:
+        return JSONResponse(content=result, media_type="application/json")
+    else:
+        raise HTTPException(status_code=404, detail="No schedules found")
+@router.get("/schedules/object/{schedule_id}", response_model=Schedule)
+def get_schedule(schedule_id: str):
+    result = schedule_db.get_schedule_object(schedule_id)
     if result:
         return JSONResponse(content=result, media_type="application/json")
     else:
@@ -37,7 +46,15 @@ def get_schedule(schedule_id: str):
 @router.delete("/schedules/delete/{schedule_id}")
 def delete_schedule(schedule_id: str):
     result = schedule_db.delete_schedule(schedule_id)
-    if result.deleted_count:
+    if result:
         return {"message": "Schedule deleted successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="schedule not found")
+
+@router.post("/schedules/generate/{schedule_id}")
+def generate_schedule(schedule_id: str):
+    result = schedule_db.generate_schedule(schedule_id)
+    if result:
+        return {"message": "Schedule generated value toggled"}
     else:
         raise HTTPException(status_code=404, detail="schedule not found")
