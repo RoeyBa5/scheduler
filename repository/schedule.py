@@ -66,9 +66,8 @@ def convert_unserializable(schedule):
 
 
 def convert_groups_object_serializable(groups):
-    groups = [groups_db.convert_unserializable(group) for group in groups]
     groups = [{
-        **group,
+        **groups_db.convert_unserializable(group),
         "shifts": [shifts_db.convert_unserializable(shift) for shift in group['shifts']]
     } for group in groups]
     return groups
