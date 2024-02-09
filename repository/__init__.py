@@ -1,7 +1,6 @@
 import os
 
 from pymongo import MongoClient
-import config as config
 MONGODB_USERNAME = os.getenv('MONGODB_USERNAME')
 MONGODB_PASSWORD = os.getenv('MONGODB_PASSWORD')
 
