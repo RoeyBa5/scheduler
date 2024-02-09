@@ -1,7 +1,11 @@
+import os
+
 from pymongo import MongoClient
 import config as config
+MONGODB_USERNAME = os.getenv('MONGODB_USERNAME')
+MONGODB_PASSWORD = os.getenv('MONGODB_PASSWORD')
 
-client = MongoClient(f'mongodb+srv://{config.MONGODB_USERNAME}:{config.MONGODB_PASSWORD}@cluster0.pfk33au.mongodb.net/')
+client = MongoClient(f'mongodb+srv://{MONGODB_USERNAME}:{MONGODB_PASSWORD}@cluster0.pfk33au.mongodb.net/')
 db = client['Scheduler-db']
 
 collection_operators = db['operators']

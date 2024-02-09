@@ -3,13 +3,16 @@ from copy import deepcopy
 import pandas as pd
 from ortools.sat.python import cp_model
 
-from data_loader import load_slots, load_operators
+from rules import is_night_slot, in_interval, min_hours_gap_between_slot
 from temp_models import Placement, Group, PlacementModel, PlacementModelConfig, Qualification
 from temp_models import Slot, Operator
-from rules import is_night_slot, in_interval, min_hours_gap_between_slot
 
 KARKAI_MULTIPLIER = 0.6
 
+"""
+This class is responsible for solving the schedule problem.
+It receives a list of slots and a list of operators and returns a list of placements.
+"""
 
 class ScheduleSolver:
     def __init__(self, slots: list[Slot], operators: list[Operator]):
@@ -209,8 +212,3 @@ class ScheduleSolver:
 
         self.placements = [placement for placement, var in model.placements.items() if solver.Value(var) == 1]
         return self.placements
-
-
-solver = ScheduleSolver(slots=load_slots(), operators=load_operators())
-placements = solver.solve()
-pass
