@@ -38,22 +38,18 @@ def delete_schedule(schedule_id: str):
 # get full schedule object:
 # if generated - get all groups and shifts
 # if not - get all workers data
-def get_schedule_object(schedule_id: str):
-    schedule = collection_schedules.find_one({"_id": ObjectId(schedule_id)})
-    if schedule['is_generated']:
-        groups = list(collection_groups.aggregate([
-            {"$match": {"schedule_id": schedule_id}},
-            {"$lookup": {
-                "from": "shifts",
-                "localField": "shifts_ids",
-                "foreignField": "_id",
-                "as": "shifts"}}
-        ]))
-
-        schedule['groups'] = convert_groups_object_serializable(groups)
-        return convert_unserializable(schedule)
-    else:
-        return availabilities_db.get_availabilities(schedule_id)
+def get_schedule_object(schedule: Schedule):
+    groups = list(collection_groups.aggregate([
+        {"$match": {"schedule_id": str(schedule['_id'])}},
+        {"$lookup": {
+            "from": "shifts",
+            "localField": "shifts_ids",
+            "foreignField": "_id",
+            "as": "shifts"}}
+    ]))
+    schedule['groups'] = convert_groups_object_serializable(groups)
+    schedule['availabilities'] = availabilities_db.get_availabilities(str(schedule['_id']))
+    return convert_unserializable(schedule)
 
 
 # converts unserializable fields of schedule to str

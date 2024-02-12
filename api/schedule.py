@@ -38,8 +38,9 @@ def get_schedule(schedule_id: str):
 
 @router.get("/schedules/object/{schedule_id}", response_model=Schedule)
 def get_schedule_object(schedule_id: str):
-    result = schedule_db.get_schedule_object(schedule_id)
-    if result:
+    schedule = schedule_db.get_schedule(schedule_id)
+    if schedule:
+        result = schedule_db.get_schedule_object(schedule)
         return JSONResponse(content=result, media_type="application/json")
     else:
         raise HTTPException(status_code=404, detail="No schedule found with given id")

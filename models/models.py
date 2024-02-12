@@ -30,6 +30,7 @@ class Group(BaseModel):
     _id: str
     schedule_id: str
     name: str
+    subtitle: str
     start_time: datetime
     end_time: datetime
     shifts_ids: List["str"] = []
@@ -38,12 +39,13 @@ class Group(BaseModel):
 class Type(BaseModel):
     _id: str
     name: str
-    num_of_operators: int
+    required_trainings: List["str"] = []
 
 
 class Shift(BaseModel):
     _id: str
     group_id: str
+    type_id: str
     start_time: datetime
     end_time: datetime
     assignment: dict  # key : training_id, value: operator_id
