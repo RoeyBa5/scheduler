@@ -41,7 +41,7 @@ def get_types():
     if result:
         return JSONResponse(content=result, media_type="application/json")
     else:
-        raise HTTPException(status_code=404, detail="No types found")
+        return {"message": "No types found"}
 
 
 @router.get("/types/{type_id}", response_model=Type)

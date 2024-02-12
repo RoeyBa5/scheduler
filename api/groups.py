@@ -34,11 +34,14 @@ def remove_group(group_id: str):
 # handles both get all groups and get groups of schedule (if passed as query param)
 @router.get("/groups/", response_model=List[Group])
 def get_groups(schedule_id: str = Query(None)):
+    schedule_exists = schedule_db.get_schedule(schedule_id)
+    if schedule_id and not schedule_exists:
+        raise HTTPException(status_code=404, detail="Schedule provided but not found")
     result = groups_db.get_groups(schedule_id)
     if result:
         return JSONResponse(content=result, media_type="application/json")
     else:
-        raise HTTPException(status_code=404, detail="No groups found")
+        return {"message": "No groups found"}
 
 
 @router.get("/groups/{group_id}")

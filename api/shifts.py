@@ -51,11 +51,14 @@ def update_shift(shift_id: str, shift: Shift):
 
 @router.get("/shifts/", response_model=List[Shift])
 def get_shifts(group_id: str = Query(None)):
+    group_exists = groups_db.get_group(group_id)
+    if group_id and not group_exists:
+        raise HTTPException(status_code=404, detail="Group provided but not found")
     result = shifts_db.get_shifts(group_id)
     if result:
         return JSONResponse(content=result, media_type="application/json")
     else:
-        raise HTTPException(status_code=404, detail="No shifts found")
+        return {"message": "No shifts found"}
 
 
 @router.get("/shifts/{shift_id}", response_model=Shift)

@@ -24,7 +24,7 @@ def get_trainings():
     if result:
         return JSONResponse(content=result, media_type="application/json")
     else:
-        raise HTTPException(status_code=404, detail="No training found")
+        return {"message": "No trainings found"}
 
 
 @router.get("/trainings/{training_id}")

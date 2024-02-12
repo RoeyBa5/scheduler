@@ -34,7 +34,7 @@ def get_operators():
     if result:
         return JSONResponse(content=result, media_type="application/json")
     else:
-        raise HTTPException(status_code=404, detail="No operators found")
+        return {"message": "No operators found"}
 
 
 @router.get("/operators/{operator_id}")

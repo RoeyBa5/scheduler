@@ -19,11 +19,17 @@ db integrity:
 
 @router.get("/requests/", response_model=List[Request])
 def get_requests(schedule_id: str = Query(None), operator_id: str = Query(None)):
+    schedule_exists = schedules_db.get_schedule(schedule_id)
+    operator_exists = operators_db.get_operator(operator_id)
+    if schedule_id and not schedule_exists:
+        raise HTTPException(status_code=404, detail="Schedule provided but not found")
+    if operator_id and not operator_exists:
+        raise HTTPException(status_code=404, detail="Operator provided but not found")
     result = requests_db.get_requests(schedule_id, operator_id)
     if result:
         return JSONResponse(content=result, media_type="application/json")
     else:
-        raise HTTPException(status_code=404, detail="No requests found")
+        return {"message": "No requests found"}
 
 
 @router.post("/requests/create/")
