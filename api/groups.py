@@ -34,11 +34,11 @@ def remove_group(group_id: str):
 # handles both get all groups and get groups of schedule (if passed as query param)
 @router.get("/groups/", response_model=List[Group])
 def get_groups(schedule_id: str = Query(None)):
+    schedule_exists = schedule_db.get_schedule(schedule_id)
+    if schedule_id and not schedule_exists:
+        raise HTTPException(status_code=404, detail="Schedule provided but not found")
     result = groups_db.get_groups(schedule_id)
-    if result:
-        return JSONResponse(content=result, media_type="application/json")
-    else:
-        raise HTTPException(status_code=404, detail="No groups found")
+    return JSONResponse(content=result, media_type="application/json")
 
 
 @router.get("/groups/{group_id}")
@@ -54,7 +54,7 @@ def get_group(group_id: str):
 @router.post("/groups/rename/{group_id}")
 def update_group(group_id: str, new_name: str):
     result = groups_db.rename_group(group_id, new_name)
-    if result:
+    if result.modified_count:
         return {"message": "Group renamed successfully"}
     else:
         raise HTTPException(status_code=404, detail="No group found with given id")

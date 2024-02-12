@@ -38,10 +38,7 @@ def update_type(type_id: str, type: Type):
 @router.get("/types/", response_model=List[Type])
 def get_types():
     result = types_db.get_types()
-    if result:
-        return JSONResponse(content=result, media_type="application/json")
-    else:
-        raise HTTPException(status_code=404, detail="No types found")
+    return JSONResponse(content=result, media_type="application/json")
 
 
 @router.get("/types/{type_id}", response_model=Type)

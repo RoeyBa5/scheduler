@@ -21,10 +21,7 @@ def create_schedule(schedule: Schedule):
 @router.get("/schedules/", response_model=List[Schedule])
 def get_schedules():
     result = schedule_db.get_schedules()
-    if result:
-        return JSONResponse(content=result, media_type="application/json")
-    else:
-        raise HTTPException(status_code=404, detail="No schedules found")
+    return JSONResponse(content=result, media_type="application/json")
 
 
 @router.get("/schedules/{schedule_id}", response_model=Schedule)
@@ -34,13 +31,16 @@ def get_schedule(schedule_id: str):
         return JSONResponse(content=result, media_type="application/json")
     else:
         raise HTTPException(status_code=404, detail="No schedules found")
+
+
 @router.get("/schedules/object/{schedule_id}", response_model=Schedule)
-def get_schedule(schedule_id: str):
-    result = schedule_db.get_schedule_object(schedule_id)
-    if result:
+def get_schedule_object(schedule_id: str):
+    schedule = schedule_db.get_schedule(schedule_id)
+    if schedule:
+        result = schedule_db.get_schedule_object(schedule)
         return JSONResponse(content=result, media_type="application/json")
     else:
-        raise HTTPException(status_code=404, detail="No schedules found")
+        raise HTTPException(status_code=404, detail="No schedule found with given id")
 
 
 @router.delete("/schedules/delete/{schedule_id}")
@@ -50,6 +50,7 @@ def delete_schedule(schedule_id: str):
         return {"message": "Schedule deleted successfully"}
     else:
         raise HTTPException(status_code=404, detail="schedule not found")
+
 
 @router.post("/schedules/generate/{schedule_id}")
 def generate_schedule(schedule_id: str):
