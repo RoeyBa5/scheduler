@@ -21,10 +21,7 @@ def create_training(training: Training):
 @router.get("/trainings/", response_model=List[Training])
 def get_trainings():
     result = trainings_db.get_trainings()
-    if result:
-        return JSONResponse(content=result, media_type="application/json")
-    else:
-        return {"message": "No trainings found"}
+    return JSONResponse(content=result, media_type="application/json")
 
 
 @router.get("/trainings/{training_id}")

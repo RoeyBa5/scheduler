@@ -37,7 +37,7 @@ def delete_all_shifts():
     if result.deleted_count:
         return {'message': 'All shifts deleted successfully', 'deleted_count': result.deleted_count}
     else:
-        return HTTPException(status_code=404, detail="No shifts found")
+        raise HTTPException(status_code=404, detail="No shifts found")
 
 
 @router.post("/shifts/{shift_id}")
@@ -46,7 +46,7 @@ def update_shift(shift_id: str, shift: Shift):
     if result.modified_count:
         return {"message": "Shift updated successfully"}
     else:
-        raise HTTPException(status_code=404, detail="Shift not found")
+        raise HTTPException(status_code=404, detail="Shift not found or nothing to update")
 
 
 @router.get("/shifts/", response_model=List[Shift])
@@ -55,10 +55,7 @@ def get_shifts(group_id: str = Query(None)):
     if group_id and not group_exists:
         raise HTTPException(status_code=404, detail="Group provided but not found")
     result = shifts_db.get_shifts(group_id)
-    if result:
-        return JSONResponse(content=result, media_type="application/json")
-    else:
-        return {"message": "No shifts found"}
+    return JSONResponse(content=result, media_type="application/json")
 
 
 @router.get("/shifts/{shift_id}", response_model=Shift)

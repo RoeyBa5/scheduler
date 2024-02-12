@@ -21,10 +21,7 @@ def create_schedule(schedule: Schedule):
 @router.get("/schedules/", response_model=List[Schedule])
 def get_schedules():
     result = schedule_db.get_schedules()
-    if result:
-        return JSONResponse(content=result, media_type="application/json")
-    else:
-        return {"message": "No shcedules found"}
+    return JSONResponse(content=result, media_type="application/json")
 
 
 @router.get("/schedules/{schedule_id}", response_model=Schedule)

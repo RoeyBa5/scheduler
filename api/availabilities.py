@@ -19,10 +19,7 @@ def get_availabilities(schedule_id: str = Query(None), operator_id: str = Query(
     if operator_id and not operator_exists:
         raise HTTPException(status_code=404, detail="Operator provided but not found")
     result = availabilities_db.get_availabilities(schedule_id, operator_id)
-    if result:
-        return JSONResponse(content=result, media_type="application/json")
-    else:
-        return {"message": "No availabilities found"}
+    return JSONResponse(content=result, media_type="application/json")
 
 
 @router.post("/availabilities/create/")

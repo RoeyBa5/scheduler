@@ -31,10 +31,7 @@ def create_operators(operators: List[Operator]):
 @router.get("/operators/", response_model=List[Operator])
 def get_operators():
     result = operators_db.get_operators()
-    if result:
-        return JSONResponse(content=result, media_type="application/json")
-    else:
-        return {"message": "No operators found"}
+    return JSONResponse(content=result, media_type="application/json")
 
 
 @router.get("/operators/{operator_id}")
@@ -88,7 +85,7 @@ def add_training_to_operator(operator_id: str, training_id: str):
                 raise HTTPException(status_code=404, detail="Error: training not added")
         else:
             raise HTTPException(status_code=404, detail="Training already in operator's trainings list")
-    raise HTTPException(status_code=404, detail="Operator or training ID not valid")
+    raise HTTPException(status_code=404, detail="Operator or training ID not found")
 
 
 # remove <training_id> from <operator_id> list of trainings - get params from query
@@ -105,4 +102,4 @@ def remove_training_from_operator(operator_id: str, training_id: str):
                 raise HTTPException(status_code=404, detail="Error: training not removed")
         else:
             raise HTTPException(status_code=404, detail="Training not found operator's trainings list")
-    raise HTTPException(status_code=404, detail="Operator or training ID not valid")
+    raise HTTPException(status_code=404, detail="Operator or training ID not found")

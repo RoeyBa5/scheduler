@@ -26,10 +26,7 @@ def get_requests(schedule_id: str = Query(None), operator_id: str = Query(None))
     if operator_id and not operator_exists:
         raise HTTPException(status_code=404, detail="Operator provided but not found")
     result = requests_db.get_requests(schedule_id, operator_id)
-    if result:
-        return JSONResponse(content=result, media_type="application/json")
-    else:
-        return {"message": "No requests found"}
+    return JSONResponse(content=result, media_type="application/json")
 
 
 @router.post("/requests/create/")

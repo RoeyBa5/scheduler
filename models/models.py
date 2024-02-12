@@ -1,8 +1,7 @@
 from datetime import datetime
 from typing import List
 
-from bson import ObjectId
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class Training(BaseModel):
@@ -39,7 +38,7 @@ class Group(BaseModel):
 class Type(BaseModel):
     _id: str
     name: str
-    required_trainings: List["str"] = []
+    required_trainings: List["str"]
 
 
 class Shift(BaseModel):
