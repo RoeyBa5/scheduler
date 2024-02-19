@@ -10,7 +10,7 @@ from solver.temp_models import SingleSlot, Qualification, Operator, Sector, Cons
 DATE_FORMAT = '%d/%m/%YT%H:%M'
 
 # Replace 'path/to/credentials.json' with your service account credentials file
-creds = ServiceAccountCredentials.from_json_keyfile_name('solver/creds.json')
+creds = None #ServiceAccountCredentials.from_json_keyfile_name('solver/creds.json')
 client = gspread.authorize(creds)
 
 # Open the specific Google Sheet by its URL or title
