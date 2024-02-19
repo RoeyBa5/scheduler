@@ -56,7 +56,7 @@ def delete_schedule(schedule_id: str):
         raise HTTPException(status_code=404, detail="schedule not found")
 
 
-@router.post("/schedules/generate/{schedule_id}")
+@router.post("/schedules/generate")
 def generate_schedule(schedule: Schedule2) -> Schedule2:
     slots = _extract_slots(schedule)
     workers = _extract_workers(schedule)
@@ -77,7 +77,7 @@ def _extract_slots(schedule: Schedule2) -> list[SingleSlot]:
                         group_id=group.id,
                         qualification=Qualification(position),
                         description=slot.name,
-                        pre_scheduled=slot.assigned_workers[position]
+                        pre_scheduled=Operator(*slot.assigned_workers[position])
                     ))
     return slots
 
