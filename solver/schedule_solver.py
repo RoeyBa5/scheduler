@@ -3,19 +3,22 @@ from copy import deepcopy
 import pandas as pd
 from ortools.sat.python import cp_model
 
-from rules import is_night_slot, in_interval, min_hours_gap_between_slot
-from temp_models import Placement, Group, PlacementModel, PlacementModelConfig, Qualification
-from temp_models import Slot, Operator
+from solver.data_loader import load_operators, load_slots
+from solver.rules import is_night_slot, in_interval, min_hours_gap_between_slot
+from solver.temp_models import Placement, Group, PlacementModel, PlacementModelConfig, Qualification, Sector
+from solver.temp_models import SingleSlot, Operator
 
 KARKAI_MULTIPLIER = 0.6
+SHIFTS_PER_MIL = 2
 
 """
 This class is responsible for solving the schedule problem.
 It receives a list of slots and a list of operators and returns a list of placements.
 """
 
+
 class ScheduleSolver:
-    def __init__(self, slots: list[Slot], operators: list[Operator]):
+    def __init__(self, slots: list[SingleSlot], operators: list[Operator]):
         self.slots = slots
         self.operators = operators
 
@@ -120,13 +123,23 @@ class ScheduleSolver:
                             close_slots
                             if Placement(operator, other_slot) in placements) <= 8
                     )
-                return PlacementModel(model=model, placements=placements, placements_by_operator=placements_by_operator)
+            return PlacementModel(model=model, placements=placements, placements_by_operator=placements_by_operator)
 
         def get_model_with_configurable_constraints(model: PlacementModel,
                                                     config: PlacementModelConfig) -> PlacementModel:
-            # Add constarint that minimize the amount of nights for each operator.
+            mil_ops = [op for op in operators_to_place if op.sector == Sector.MIL]
+            not_mil_ops = [op for op in operators_to_place if op.sector != Sector.MIL]
+            # Add constarint that minimize the amount of nights for each operator who is Mil
+            for operator in mil_ops:
+                night_count_per_op = sum(
+                    model.placements[Placement(operator, slot)]
+                    for slot in self.slots if Placement(operator, slot) in model.placements
+                    if is_night_slot(slot)
+                )
+                model.model.Add(night_count_per_op <= int(SHIFTS_PER_MIL * config.balance_ratio / 2))
+            # Add constarint that minimize the amount of nights for each operator who is not Mil.
             night_count = len(
-                [slot for slot in self.slots if is_night_slot(slot)]) / len(
+                [slot for slot in self.slots if is_night_slot(slot) - SHIFTS_PER_MIL * len(mil_ops) / 2]) / len(
                 operators_to_place)
             for operator in operators_to_place:
                 night_count_per_op = sum(
@@ -135,15 +148,25 @@ class ScheduleSolver:
                     if is_night_slot(slot)
                 )
                 model.model.Add(night_count_per_op <= int(night_count * config.balance_ratio))
-                model.model.Add(night_count_per_op >= int(night_count * 1 / config.balance_ratio))
+                # model.model.Add(night_count_per_op >= int(night_count * 1 / config.balance_ratio))
 
             total_seconds_to_assign = sum(
                 int((slot.end_time - slot.start_time).total_seconds()) * (KARKAI_MULTIPLIER if slot.qualification ==
                                                                                                Qualification.KARKAI else 1)
                 for slot in self.slots)
-            avg_slots_per_operator = total_seconds_to_assign / len(operators_to_place)
-            # make sure each operator has at least 80% of the average hours and at most 120% of the average hours
-            for operator in operators_to_place:
+
+            # # make sure each Mil does the amount of shifts per day
+            for operator in mil_ops:
+                slots_count = sum(
+                    model.placements[Placement(operator, slot)] for slot in self.slots if
+                    Placement(operator, slot) in model.placements
+                )
+                model.model.Add(slots_count <= int(SHIFTS_PER_MIL * config.balance_ratio))
+                model.model.Add(slots_count >= int(SHIFTS_PER_MIL * 1 / config.balance_ratio))
+            # make sure each operator who is not Mil has at least 80% of the average hours and at most 120% of the average hours
+            avg_slots_per_operator = (total_seconds_to_assign - SHIFTS_PER_MIL * 4 * 60 * 60 * len(mil_ops)) / len(
+                not_mil_ops)
+            for operator in not_mil_ops:
                 slots_count = sum(
                     model.placements[Placement(operator, slot)] * int(
                         (slot.end_time - slot.start_time).total_seconds() * (
@@ -173,7 +196,6 @@ class ScheduleSolver:
             model.model.Maximize(sum(requests_fulfilled_vars))
 
             # for the marathon group, minimize the days that each operator does more than 1 slot
-
             for operator in [operator for operator in self.operators if operator.group == Group.MARATHON]:
                 # minimize the days that each operator does more than 1 slot
                 vars = []
@@ -212,3 +234,16 @@ class ScheduleSolver:
 
         self.placements = [placement for placement, var in model.placements.items() if solver.Value(var) == 1]
         return self.placements
+
+
+# operators = load_operators()
+# slots = load_slots()
+# solution = ScheduleSolver(slots, operators).solve()
+# for operator in operators:
+#     op_slots = [placement.slot for placement in solution if placement.operator == operator]
+#     print(f"Operator {operator.name}, from sector {operator.sector} has {len(op_slots)} slots")
+#     night_slots = [slot for slot in op_slots if is_night_slot(slot)]
+#     print(f"Operator {operator.name} has {len(night_slots)} night slots")
+#     [print(f"Slot {slot.start_time} - {slot.end_time}") for slot in op_slots]
+#     print('--------------------')
+# pass

@@ -5,12 +5,12 @@ import gspread
 import pandas as pd
 from oauth2client.service_account import ServiceAccountCredentials
 
-from temp_models import Slot, Qualification, Operator, Sector, Constraint, Availability
+from solver.temp_models import SingleSlot, Qualification, Operator, Sector, Constraint, Availability
 
 DATE_FORMAT = '%d/%m/%YT%H:%M'
 
 # Replace 'path/to/credentials.json' with your service account credentials file
-creds = ServiceAccountCredentials.from_json_keyfile_name('creds.json')
+creds = ServiceAccountCredentials.from_json_keyfile_name('solver/creds.json')
 client = gspread.authorize(creds)
 
 # Open the specific Google Sheet by its URL or title
@@ -30,13 +30,14 @@ def load_slots():
     shifts = []
     shifts_df = pd.DataFrame(shifts_ws.get_all_records())
     for row in shifts_df.to_dict(orient='records'):
-        shifts.append(Slot(
-            id=uuid.uuid4(),
+        shifts.append(SingleSlot(
+            id=str(uuid.uuid4()),
             start_time=datetime.strptime(f'{row["start_date"]}T{row["start_time"]}', DATE_FORMAT),
             end_time=datetime.strptime(f'{row["end_date"]}T{row["end_time"]}', DATE_FORMAT),
             qualification=Qualification(row['qualification']),
+            group_id='',
             description=row['description'],
-            pre_scheduled=row['pre_scheduled'],
+            pre_scheduled=None # row['pre_scheduled'],
         ))
     return shifts
 

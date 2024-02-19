@@ -1,9 +1,9 @@
 import dataclasses
-import uuid
 from datetime import datetime
 from enum import Enum
 
 from ortools.sat.python.cp_model import CpModel
+from pydantic import BaseModel
 
 
 class Qualification(Enum):
@@ -29,11 +29,15 @@ class Sector(Enum):
 
 
 @dataclasses.dataclass
-class Request:
+class Request2:
+    id: str
     start: datetime
     end: datetime
     description: str
     score: int
+
+    def __hash__(self):
+        return hash(self.id)
 
 
 @dataclasses.dataclass
@@ -62,12 +66,12 @@ class Availability:
 
 @dataclasses.dataclass
 class Operator:
-    id: int
+    id: str
     name: str
     sector: Sector
     qualifications: list[Qualification] = dataclasses.field(default_factory=list)
     group: Group = Group.SPRINT
-    requests: list[Request] = dataclasses.field(default_factory=list)
+    requests: set[Request2] = dataclasses.field(default_factory=set)
     constraints: list[Constraint] = dataclasses.field(default_factory=list)
     availabilities: list[Availability] = dataclasses.field(default_factory=list)
     # other_shifts: list[OtherShift] = dataclasses.field(default_factory=list)
@@ -77,23 +81,23 @@ class Operator:
         return hash(self.id)
 
 
-@dataclasses.dataclass
-class Slot:
-    id: uuid.UUID
+class SingleSlot(BaseModel):
+    id: str
     start_time: datetime
     end_time: datetime
     qualification: Qualification
+    group_id: str
     description: str = ""
-    pre_scheduled: str = ""
+    pre_scheduled: Operator | None = None
 
     def __hash__(self):
-        return hash(self.id)
+        return hash((self.id, self.qualification))
 
 
 @dataclasses.dataclass
 class Placement:
     operator: Operator
-    slot: Slot
+    slot: SingleSlot
 
     def __hash__(self):
         return hash((self.operator, self.slot))
