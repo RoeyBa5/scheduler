@@ -212,3 +212,4 @@ class ScheduleSolver:
 
         self.placements = [placement for placement, var in model.placements.items() if solver.Value(var) == 1]
         return self.placements
+#
