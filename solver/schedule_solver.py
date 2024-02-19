@@ -3,7 +3,6 @@ from copy import deepcopy
 import pandas as pd
 from ortools.sat.python import cp_model
 
-from solver.data_loader import load_operators, load_slots
 from solver.rules import is_night_slot, in_interval, min_hours_gap_between_slot
 from solver.temp_models import Placement, Group, PlacementModel, PlacementModelConfig, Qualification, Sector
 from solver.temp_models import SingleSlot, Operator
@@ -234,7 +233,6 @@ class ScheduleSolver:
 
         self.placements = [placement for placement, var in model.placements.items() if solver.Value(var) == 1]
         return self.placements
-
 
 # operators = load_operators()
 # slots = load_slots()
