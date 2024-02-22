@@ -4,6 +4,7 @@ from enum import Enum
 
 from ortools.sat.python.cp_model import CpModel
 from pydantic import BaseModel
+from pydantic.alias_generators import to_camel
 
 
 class Qualification(Enum):
@@ -28,8 +29,7 @@ class Sector(Enum):
     MIL = 'mil'
 
 
-@dataclasses.dataclass
-class Request2:
+class Request2(BaseModel):
     id: str
     start: datetime
     end: datetime
@@ -38,6 +38,9 @@ class Request2:
 
     def __hash__(self):
         return hash(self.id)
+
+    class Config:
+        alias_generator = to_camel
 
 
 @dataclasses.dataclass

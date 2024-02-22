@@ -3,6 +3,7 @@ from enum import Enum
 from typing import List
 
 from pydantic import BaseModel
+from pydantic.alias_generators import to_camel
 
 from solver.temp_models import Request2
 
@@ -108,6 +109,9 @@ class Worker2(BaseModel):
     def __hash__(self):
         return hash(self.id)
 
+    class Config:
+        alias_generator = to_camel
+
 
 class Slot2(BaseModel):
     id: str
@@ -116,6 +120,9 @@ class Slot2(BaseModel):
     start: datetime
     end: datetime
     assigned_workers: dict[Qualification, Worker2]
+
+    class Config:
+        alias_generator = to_camel
 
 
 class SingleSlot(BaseModel):
@@ -132,19 +139,29 @@ class SingleSlot(BaseModel):
 
 class Group2(BaseModel):
     id: str
-    name: str
+    title: str
+    sub_title: str
     slots: list[Slot2]
+
+    class Config:
+        alias_generator = to_camel
 
 
 class Day2(BaseModel):
     id: str
     date: datetime
     groups: list[Group2]
-    workersData: list[Worker2]
+    workers_data: list[Worker2]
+
+    class Config:
+        alias_generator = to_camel
 
 
 class Schedule2(BaseModel):
     id: str
     name: str
     days: list[Day2]
-    isGenerated: bool
+    is_generated: bool
+
+    class Config:
+        alias_generator = to_camel
