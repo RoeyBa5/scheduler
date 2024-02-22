@@ -119,7 +119,7 @@ class Slot2(BaseModel):
     type: str
     start: datetime
     end: datetime
-    assigned_workers: dict[Qualification, Worker2]
+    assigned_workers: dict[Qualification, Worker2 | None]
 
     class Config:
         alias_generator = to_camel
