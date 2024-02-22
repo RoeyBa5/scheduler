@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 class Qualification(Enum):
     TOL_OPERATOR = 'tol_operator'
-    TOL_COMMANDEER = 'tol_commander'
+    TOL_COMMANDER = 'tol_commander'
     HOZI_OPEARTOR = 'hozi_operator'
     HOZI_COMMANDER = 'hozi_commander'
     HEAVY_OPERATOR = 'heavy_operator'

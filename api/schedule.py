@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 import repository.schedule as schedule_db
 from api import router
 from models.models import Schedule, Schedule2, Worker2
-from solver.schedule_solver import ScheduleSolver
+from solver.schedule_solver import ScheduleSolver, NoSolutionFound
 from solver.temp_models import SingleSlot, Qualification, Operator, Availability, Sector, Placement
 
 
@@ -60,7 +60,10 @@ def delete_schedule(schedule_id: str):
 def generate_schedule(schedule: Schedule2) -> Schedule2:
     slots = _extract_slots(schedule)
     workers = _extract_workers(schedule)
-    solution = ScheduleSolver(slots, workers).solve()
+    try:
+        solution = ScheduleSolver(slots, workers).solve()
+    except NoSolutionFound as e:
+        raise HTTPException(status_code=500, detail=str(e))
     return _schedule_from_solution(schedule, solution)
 
 
@@ -75,9 +78,9 @@ def _extract_slots(schedule: Schedule2) -> list[SingleSlot]:
                         start_time=slot.start,
                         end_time=slot.end,
                         group_id=group.id,
-                        qualification=Qualification(position),
+                        qualification=position.value,
                         description=slot.name,
-                        pre_scheduled=Operator(*slot.assigned_workers[position])
+                        pre_scheduled=None #Operator(*slot.assigned_workers[position])
                     ))
     return slots
 

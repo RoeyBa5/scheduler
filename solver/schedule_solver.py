@@ -10,6 +10,11 @@ from solver.temp_models import SingleSlot, Operator
 KARKAI_MULTIPLIER = 0.6
 SHIFTS_PER_MIL = 2
 
+
+class NoSolutionFound(Exception):
+    pass
+
+
 """
 This class is responsible for solving the schedule problem.
 It receives a list of slots and a list of operators and returns a list of placements.
@@ -73,9 +78,7 @@ class ScheduleSolver:
             for slot in self.slots:
                 # if the slot is pre scheduled, make sure it is assigned to the operator
                 if slot.pre_scheduled:
-                    pre_scheduled_operator = next(
-                        (operator for operator in self.operators if operator.name == slot.pre_scheduled), None)
-                    model.Add(placements[Placement(pre_scheduled_operator, slot)] == 1)
+                    model.Add(placements[Placement(slot.pre_scheduled, slot)] == 1)
                     continue
 
                 placements_per_slot = sum(placements[Placement(operator, slot)] for operator in operators_to_place
@@ -163,18 +166,19 @@ class ScheduleSolver:
                 model.model.Add(slots_count <= int(SHIFTS_PER_MIL * config.balance_ratio))
                 model.model.Add(slots_count >= int(SHIFTS_PER_MIL * 1 / config.balance_ratio))
             # make sure each operator who is not Mil has at least 80% of the average hours and at most 120% of the average hours
-            avg_slots_per_operator = (total_seconds_to_assign - SHIFTS_PER_MIL * 4 * 60 * 60 * len(mil_ops)) / len(
-                not_mil_ops)
-            for operator in not_mil_ops:
-                slots_count = sum(
-                    model.placements[Placement(operator, slot)] * int(
-                        (slot.end_time - slot.start_time).total_seconds() * (
-                            KARKAI_MULTIPLIER if slot.qualification == Qualification.KARKAI else 1)) for slot in
-                    self.slots if
-                    Placement(operator, slot) in model.placements
-                )
-                model.model.Add(slots_count <= int(avg_slots_per_operator * config.balance_ratio))
-                model.model.Add(int(avg_slots_per_operator * 1 / config.balance_ratio) <= slots_count)
+            if len(not_mil_ops) > 0:
+                avg_slots_per_operator = (total_seconds_to_assign - SHIFTS_PER_MIL * 4 * 60 * 60 * len(mil_ops)) / len(
+                    not_mil_ops)
+                for operator in not_mil_ops:
+                    slots_count = sum(
+                        model.placements[Placement(operator, slot)] * int(
+                            (slot.end_time - slot.start_time).total_seconds() * (
+                                KARKAI_MULTIPLIER if slot.qualification == Qualification.KARKAI else 1)) for slot in
+                        self.slots if
+                        Placement(operator, slot) in model.placements
+                    )
+                    model.model.Add(slots_count <= int(avg_slots_per_operator * config.balance_ratio))
+                    model.model.Add(int(avg_slots_per_operator * 1 / config.balance_ratio) <= slots_count)
 
             # maximize the number of requests that are fulfilled
             requests_fulfilled_vars = []
@@ -229,7 +233,7 @@ class ScheduleSolver:
             model, solver = run_model(base_model)
 
         if not model or not solver:
-            raise Exception("No solution found")
+            raise NoSolutionFound("No solution found for this schedule")
 
         self.placements = [placement for placement, var in model.placements.items() if solver.Value(var) == 1]
         return self.placements
