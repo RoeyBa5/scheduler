@@ -44,7 +44,7 @@ class ScheduleSolver:
             for slot in self.slots:
                 if slot.pre_scheduled:
                     pre_scheduled_operator = next(
-                        (operator for operator in self.operators if operator.name == slot.pre_scheduled), None)
+                        (operator for operator in self.operators if operator.id == slot.pre_scheduled.id), None)
                     if pre_scheduled_operator:
                         placements[Placement(pre_scheduled_operator, slot)] = model.NewBoolVar(
                             f"placement_operator:{pre_scheduled_operator.id}_slot:{slot.id}")
@@ -78,8 +78,11 @@ class ScheduleSolver:
             for slot in self.slots:
                 # if the slot is pre scheduled, make sure it is assigned to the operator
                 if slot.pre_scheduled:
-                    model.Add(placements[Placement(slot.pre_scheduled, slot)] == 1)
-                    continue
+                    pre_scheduled_operator = next(
+                        (operator for operator in self.operators if operator.id == slot.pre_scheduled.id), None)
+                    if pre_scheduled_operator:
+                        model.Add(placements[Placement(pre_scheduled_operator, slot)] == 1)
+                        continue
 
                 placements_per_slot = sum(placements[Placement(operator, slot)] for operator in operators_to_place
                                           if Placement(operator, slot) in placements)

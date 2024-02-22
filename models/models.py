@@ -1,8 +1,7 @@
 from datetime import datetime
-from enum import Enum
 from typing import List
 
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from pydantic.alias_generators import to_camel
 
 from solver.temp_models import Request2, Qualification
@@ -103,7 +102,7 @@ class SlotType(BaseModel):
     id: str
     name: str
     assigned_number: int
-    required_roles: dict
+    required_roles: list[str]
 
     class Config:
         alias_generator = to_camel
@@ -112,13 +111,20 @@ class SlotType(BaseModel):
 class Slot2(BaseModel):
     id: str
     name: str
-    type: str  # SlotType
+    type: SlotType
     start: datetime
     end: datetime
     assigned_workers: dict[Qualification, Worker2 | None]
 
     class Config:
         alias_generator = to_camel
+
+    @validator("assigned_workers", pre=True)
+    def _validate_assigned_workers(cls, assigned_workers):
+        for k, v in assigned_workers.items():
+            if v == {}:
+                assigned_workers[k] = None
+        return assigned_workers
 
 
 class SingleSlot(BaseModel):

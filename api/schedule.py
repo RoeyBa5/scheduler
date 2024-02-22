@@ -78,9 +78,10 @@ def _extract_slots(schedule: Schedule2) -> list[SingleSlot]:
                         start_time=slot.start,
                         end_time=slot.end,
                         group_id=group.id,
-                        qualification=position.value,
+                        qualification=position,
                         description=slot.name,
-                        pre_scheduled=None #Operator(*slot.assigned_workers[position])
+                        pre_scheduled=Operator(*slot.assigned_workers[position])
+                        if slot.assigned_workers[position] else None
                     ))
     return slots
 
