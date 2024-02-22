@@ -113,10 +113,20 @@ class Worker2(BaseModel):
         alias_generator = to_camel
 
 
+class SlotType(BaseModel):
+    id: str
+    name: str
+    assigned_number: int
+    required_roles: dict
+
+    class Config:
+        alias_generator = to_camel
+
+
 class Slot2(BaseModel):
     id: str
     name: str
-    type: str
+    type: SlotType
     start: datetime
     end: datetime
     assigned_workers: dict[Qualification, Worker2 | None]
