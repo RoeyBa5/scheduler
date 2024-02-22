@@ -5,7 +5,7 @@ from typing import List
 from pydantic import BaseModel
 from pydantic.alias_generators import to_camel
 
-from solver.temp_models import Request2
+from solver.temp_models import Request2, Qualification
 
 
 class Training(BaseModel):
@@ -84,20 +84,6 @@ class Request(BaseModel):
 #     assigned_operator: Operator = None
 
 
-class Qualification(Enum):
-    TOL_OPERATOR = 'tol_operator'
-    TOL_COMMANDEER = 'tol_commander'
-    HOZI_OPEARTOR = 'hozi_operator'
-    HOZI_COMMANDER = 'hozi_commander'
-    HEAVY_OPERATOR = 'heavy_operator'
-    HEAVY_COMMANDEER = 'heavy_commander'
-    SIUA_SHLISHI = 'siua_shlishi'
-    SIUA_OPERATOR = 'siua_operator'
-    SIUA_COMMANDER = 'siua_commander'
-    MOVIL = 'movil'
-    KARKAI = 'karkai'
-
-
 # Bargo models
 class Worker2(BaseModel):
     id: str
@@ -126,7 +112,7 @@ class SlotType(BaseModel):
 class Slot2(BaseModel):
     id: str
     name: str
-    type: SlotType
+    type: str  # SlotType
     start: datetime
     end: datetime
     assigned_workers: dict[Qualification, Worker2 | None]

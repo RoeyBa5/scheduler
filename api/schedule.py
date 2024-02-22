@@ -63,7 +63,7 @@ def generate_schedule(schedule: Schedule2) -> Schedule2:
     try:
         solution = ScheduleSolver(slots, workers).solve()
     except NoSolutionFound as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=404, detail=str(e))
     return _schedule_from_solution(schedule, solution)
 
 
@@ -107,11 +107,14 @@ def _extract_workers(schedule: Schedule2) -> list[Operator]:
 def _schedule_from_solution(schedule: Schedule2, solution: list[Placement]) -> Schedule2:
     solved_schedule = deepcopy(schedule)
     for placement in solution:
-        slot = next((day.groups for day in solved_schedule.days for group in day.groups
+        group = next((day.groups for day in solved_schedule.days for group in day.groups
                      for slot in group.slots if slot.id == placement.slot.id), None)
+        if not group:
+            raise Exception(f"Group not found for placement {placement}")
+        slot = next((slot for slot in group[0].slots if slot.id == placement.slot.id), None)
         if not slot:
             raise Exception(f"Slot not found for placement {placement}")
-        slot.assigned_workers[placement.operator.qualifications] = Worker2(
+        slot.assigned_workers[placement.slot.qualification] = Worker2(
             id=placement.operator.id,
             name=placement.operator.name,
             roles=placement.operator.qualifications,

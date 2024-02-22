@@ -13,7 +13,7 @@ class Qualification(Enum):
     HOZI_OPEARTOR = 'hozi_operator'
     HOZI_COMMANDER = 'hozi_commander'
     HEAVY_OPERATOR = 'heavy_operator'
-    HEAVY_COMMANDEER = 'heavy_commander'
+    HEAVY_COMMANDER = 'heavy_commander'
     SIUA_SHLISHI = 'siua_shlishi'
     SIUA_OPERATOR = 'siua_operator'
     SIUA_COMMANDER = 'siua_commander'
