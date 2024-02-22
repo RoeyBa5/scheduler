@@ -88,7 +88,7 @@ def _extract_slots(schedule: Schedule2) -> list[SingleSlot]:
 def _extract_workers(schedule: Schedule2) -> list[Operator]:
     workers = dict()
     for day in schedule.days:
-        for worker in day.workersData:
+        for worker in day.workers_data:
             if worker.id not in workers:
                 workers[worker.id] = Operator(
                     id=worker.id,
