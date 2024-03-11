@@ -142,7 +142,7 @@ class SingleSlot(BaseModel):
 class Group2(BaseModel):
     id: str
     title: str
-    sub_title: str
+    sub_title: str | None = None
     slots: list[Slot2]
 
     class Config:
