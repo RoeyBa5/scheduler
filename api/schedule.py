@@ -9,7 +9,7 @@ import repository.schedule as schedule_db
 from api import router
 from models.models import Schedule, Schedule2, Worker2
 from solver.schedule_solver import ScheduleSolver, NoSolutionFound
-from solver.temp_models import SingleSlot, Qualification, Operator, Availability, Sector, Placement
+from solver.temp_models import SingleSlot, Operator, Availability, Sector, Placement
 
 
 # CRUD operations
@@ -108,18 +108,19 @@ def _extract_workers(schedule: Schedule2) -> list[Operator]:
 def _schedule_from_solution(schedule: Schedule2, solution: list[Placement]) -> Schedule2:
     solved_schedule = deepcopy(schedule)
     for placement in solution:
-        group = next((day.groups for day in solved_schedule.days for group in day.groups
-                     for slot in group.slots if slot.id == placement.slot.id), None)
-        if not group:
-            raise Exception(f"Group not found for placement {placement}")
-        slot = next((slot for slot in group[0].slots if slot.id == placement.slot.id), None)
-        if not slot:
+        found = False
+        for day in solved_schedule.days:
+            for group in day.groups:
+                for slot in group.slots:
+                    if slot.id == placement.slot.id:
+                        slot.assigned_workers[placement.slot.qualification] = Worker2(
+                            id=placement.operator.id,
+                            name=placement.operator.name,
+                            roles=placement.operator.qualifications,
+                            requests=placement.operator.requests,
+                            availability="Available"
+                        )
+                        found = True
+        if not found:
             raise Exception(f"Slot not found for placement {placement}")
-        slot.assigned_workers[placement.slot.qualification] = Worker2(
-            id=placement.operator.id,
-            name=placement.operator.name,
-            roles=placement.operator.qualifications,
-            requests=placement.operator.requests,
-            availability="Available"
-        )
     return solved_schedule
