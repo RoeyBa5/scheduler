@@ -1,13 +1,16 @@
+import logging
 from copy import deepcopy
 from datetime import timedelta
 from typing import List
 
+from fastapi import BackgroundTasks
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 
 import repository.schedule as schedule_db
 from api import router
 from models.models import Schedule, Schedule2, Worker2
+from repository import collection_schedules2
 from solver.schedule_solver import ScheduleSolver, NoSolutionFound
 from solver.temp_models import SingleSlot, Operator, Availability, Sector, Placement
 
@@ -28,13 +31,13 @@ def get_schedules():
     return JSONResponse(content=result, media_type="application/json")
 
 
-@router.get("/schedules/{schedule_id}", response_model=Schedule)
-def get_schedule(schedule_id: str):
-    result = schedule_db.get_schedule(schedule_id)
-    if result:
-        return JSONResponse(content=result, media_type="application/json")
-    else:
-        raise HTTPException(status_code=404, detail="No schedules found")
+# @router.get("/schedules/{schedule_id}", response_model=Schedule)
+# def get_schedule(schedule_id: str):
+#     result = schedule_db.get_schedule(schedule_id)
+#     if result:
+#         return JSONResponse(content=result, media_type="application/json")
+#     else:
+#         raise HTTPException(status_code=404, detail="No schedules found")
 
 
 @router.get("/schedules/object/{schedule_id}", response_model=Schedule)
@@ -57,14 +60,34 @@ def delete_schedule(schedule_id: str):
 
 
 @router.post("/schedules/generate")
-def generate_schedule(schedule: Schedule2) -> Schedule2:
+def generate_schedule(schedule: Schedule2, background_tasks: BackgroundTasks):
+    background_tasks.add_task(_generate_schedule, schedule)
+    return {f"message": f"Schedule generation started for {schedule.id}"}
+
+
+def _generate_schedule(schedule: Schedule2):
+    collection_schedules2.delete_many({"id": schedule.id})
     slots = _extract_slots(schedule)
     workers = _extract_workers(schedule)
     try:
         solution = ScheduleSolver(slots, workers).solve()
-    except NoSolutionFound as e:
-        raise HTTPException(status_code=404, detail=str(e))
-    return _schedule_from_solution(schedule, solution)
+        solved_schedule = _schedule_from_solution(schedule, solution)
+        collection_schedules2.insert_one(solved_schedule.dict(by_alias=True))
+        logging.info(f'Generated Schedule for {solved_schedule.id}')
+    except NoSolutionFound:
+        collection_schedules2.insert_one(schedule=schedule.dict())
+        logging.info(f'No solution found for {schedule.id}')
+
+
+@router.get("/schedules/{schedule_id}", response_model=Schedule2)
+def get_schedule(schedule_id: str) -> Schedule2:
+    db_schedule = collection_schedules2.find_one({"id": schedule_id})
+    if not db_schedule:
+        raise HTTPException(status_code=404, detail="No schedule found with given id")
+    schedule = Schedule2.parse_obj(db_schedule)
+    if not schedule.is_generated:
+        raise HTTPException(status_code=404, detail="No solution found for schedule")
+    return schedule
 
 
 def _extract_slots(schedule: Schedule2) -> list[SingleSlot]:
@@ -97,7 +120,7 @@ def _extract_workers(schedule: Schedule2) -> list[Operator]:
                     sector=Sector.MIL,
                     qualifications=worker.roles,
                 )
-            workers[worker.id].requests.update(worker.requests)
+            workers[worker.id].requests += worker.requests
             if worker.availability == "Available":
                 workers[worker.id].availabilities.append(Availability(start=day.date,
                                                                       end=day.date + timedelta(days=1)))
@@ -123,4 +146,5 @@ def _schedule_from_solution(schedule: Schedule2, solution: list[Placement]) -> S
                         found = True
         if not found:
             raise Exception(f"Slot not found for placement {placement}")
+    solved_schedule.is_generated = True
     return solved_schedule

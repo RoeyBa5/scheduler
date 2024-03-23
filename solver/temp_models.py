@@ -1,13 +1,13 @@
 import dataclasses
 from datetime import datetime
-from enum import Enum
+from enum import Enum, StrEnum
 
 from ortools.sat.python.cp_model import CpModel
 from pydantic import BaseModel
 from pydantic.alias_generators import to_camel
 
 
-class Qualification(Enum):
+class Qualification(StrEnum):
     TOL_OPERATOR = 'tol_operator'
     TOL_COMMANDER = 'tol_commander'
     HOZI_OPEARTOR = 'hozi_operator'
@@ -74,7 +74,7 @@ class Operator:
     sector: Sector
     qualifications: list[Qualification] = dataclasses.field(default_factory=list)
     group: Group = Group.SPRINT
-    requests: set[Request2] = dataclasses.field(default_factory=set)
+    requests: list[Request2] = dataclasses.field(default_factory=list)
     constraints: list[Constraint] = dataclasses.field(default_factory=list)
     availabilities: list[Availability] = dataclasses.field(default_factory=list)
     # other_shifts: list[OtherShift] = dataclasses.field(default_factory=list)

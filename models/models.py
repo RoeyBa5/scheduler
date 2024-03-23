@@ -1,7 +1,7 @@
 from datetime import datetime
-from typing import List
+from typing import List, Any
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, validator, Json
 from pydantic.alias_generators import to_camel
 
 from solver.temp_models import Request2, Qualification
@@ -89,7 +89,7 @@ class Worker2(BaseModel):
     name: str
     availability: str
     roles: list[Qualification]
-    requests: set[Request2]
+    requests: list[Request2]
 
     def __hash__(self):
         return hash(self.id)
@@ -148,7 +148,6 @@ class Group2(BaseModel):
     class Config:
         alias_generator = to_camel
 
-
 class Day2(BaseModel):
     id: str
     date: datetime
@@ -167,3 +166,9 @@ class Schedule2(BaseModel):
 
     class Config:
         alias_generator = to_camel
+
+
+class DBSchedule(BaseModel):
+    id: str
+    is_generated: bool
+    schedule: Json[Any]

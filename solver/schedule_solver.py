@@ -132,7 +132,6 @@ class ScheduleSolver:
 
         def get_model_with_configurable_constraints(model: PlacementModel,
                                                     config: PlacementModelConfig) -> PlacementModel:
-            return model
             mil_ops = [op for op in operators_to_place if op.sector == Sector.MIL]
             not_mil_ops = [op for op in operators_to_place if op.sector != Sector.MIL]
             # Add constarint that minimize the amount of nights for each operator who is Mil
