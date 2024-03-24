@@ -28,7 +28,7 @@ jobs:
       - name: Create new ElasticBeanstalk Application Version
         run: |
           aws elasticbeanstalk create-application-version \
-          --application-name scheduler-5 \
+          --application-name scheduler-6 \
           --source-bundle S3Bucket="elasticbeanstalk-eu-west-1-129801096970",S3Key="deploy_package.zip" \
           --version-label "ver-${{ github.sha }}" \
           --description "commit-sha-${{ github.sha }}"
