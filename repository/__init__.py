@@ -12,6 +12,7 @@ db = client['Scheduler-db']
 
 collection_operators = db['operators']
 collection_schedules = db['schedules']
+collection_schedules2 = db['schedules2']
 collection_groups = db['groups']
 collection_shifts = db['shifts']
 collection_availabilities = db['availabilities']

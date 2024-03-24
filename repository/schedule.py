@@ -2,12 +2,12 @@ import repository.availabilities as availabilities_db
 import repository.groups as groups_db
 import repository.requests as requests_db
 import repository.shifts as shifts_db
-from models.models import Schedule
+from models.models import Schedule, Schedule2
 from repository import collection_groups, object_id, execute_db
 from repository import collection_schedules
 
 
-def create_schedule(schedule: Schedule):
+def create_schedule(schedule: Schedule2):
     return execute_db(collection_schedules.insert_one, schedule.dict())
 
 
