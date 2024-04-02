@@ -28,10 +28,10 @@ jobs:
       - name: Create new ElasticBeanstalk Application Version
         run: |
           aws elasticbeanstalk create-application-version \
-          --application-name scheduler \
+          --application-name scheduler-7 \
           --source-bundle S3Bucket="elasticbeanstalk-eu-west-1-129801096970",S3Key="deploy_package.zip" \
           --version-label "ver-${{ github.sha }}" \
           --description "commit-sha-${{ github.sha }}"
 
       - name: Deploy new ElasticBeanstalk Application Version
-        run: aws elasticbeanstalk update-environment --environment-name Scheduler-env --version-label "ver-${{ github.sha }}"
+        run: aws elasticbeanstalk update-environment --environment-name Scheduler-7-env --version-label "ver-${{ github.sha }}"
