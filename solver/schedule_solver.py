@@ -107,7 +107,7 @@ class ScheduleSolver:
             # Add constraint that each operator can do up to 12 hours of work per 24 hours
             for operator, slots in placements_by_operator.items():
                 for slot in slots:
-                    # This constraint not valid for KARKAI
+                    # This constraint not valid for KARKAII
                     if slot.qualification == Qualification.KARKAI:
                         continue
                     close_slots = [other_slot for other_slot in slots
