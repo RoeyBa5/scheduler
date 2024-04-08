@@ -1,11 +1,12 @@
 import logging
 from copy import deepcopy
-from datetime import timedelta
+from datetime import timedelta, datetime
 from typing import List
 
 from fastapi import BackgroundTasks
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
+from pytz import UTC
 
 import repository.schedule as schedule_db
 from api import router
@@ -114,6 +115,7 @@ def _extract_workers(schedule: Schedule2) -> list[Operator]:
     workers = dict()
     for day in schedule.days:
         for worker in day.workers_data:
+            fixed_start_date = datetime.combine(day.date.date(), datetime.min.time()).replace(hour=6, tzinfo=UTC)
             if worker.id not in workers:
                 workers[worker.id] = Operator(
                     id=worker.id,
@@ -123,8 +125,8 @@ def _extract_workers(schedule: Schedule2) -> list[Operator]:
                 )
             workers[worker.id].requests += worker.requests
             if worker.availability == "Available":
-                workers[worker.id].availabilities.append(Availability(start=day.date,
-                                                                      end=day.date + timedelta(days=1)))
+                workers[worker.id].availabilities.append(Availability(start=fixed_start_date,
+                                                                      end=fixed_start_date + timedelta(days=1)))
 
     return list(workers.values())
 

@@ -167,7 +167,7 @@ class ScheduleSolver:
                     Placement(operator, slot) in model.placements
                 )
                 model.model.Add(slots_count <= int(SHIFTS_PER_MIL * config.balance_ratio))
-                model.model.Add(slots_count >= int(SHIFTS_PER_MIL * 1 / config.balance_ratio))
+                # model.model.Add(slots_count >= int(SHIFTS_PER_MIL * 1 / config.balance_ratio))
             # make sure each operator who is not Mil has at least 80% of the average hours and at most 120% of the average hours
             if len(not_mil_ops) > 0:
                 avg_slots_per_operator = (total_seconds_to_assign - SHIFTS_PER_MIL * 4 * 60 * 60 * len(mil_ops)) / len(
