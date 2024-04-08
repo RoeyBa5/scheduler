@@ -69,13 +69,14 @@ def _generate_schedule(schedule: Schedule2):
     collection_schedules2.delete_many({"id": schedule.id})
     slots = _extract_slots(schedule)
     workers = _extract_workers(schedule)
+    schedule.is_generated = False
     try:
         solution = ScheduleSolver(slots, workers).solve()
         solved_schedule = _schedule_from_solution(schedule, solution)
         collection_schedules2.insert_one(solved_schedule.dict(by_alias=True))
         logging.info(f'Generated Schedule for {solved_schedule.id}')
     except NoSolutionFound:
-        collection_schedules2.insert_one(schedule=schedule.dict())
+        collection_schedules2.insert_one(schedule.dict(by_alias=True))
         logging.info(f'No solution found for {schedule.id}')
 
 
@@ -86,7 +87,7 @@ def get_schedule(schedule_id: str) -> Schedule2:
         raise HTTPException(status_code=404, detail="No schedule found with given id")
     schedule = Schedule2.parse_obj(db_schedule)
     if not schedule.is_generated:
-        raise HTTPException(status_code=404, detail="No solution found for schedule")
+        raise HTTPException(status_code=404, detail="We tried to find solution for you schedule, but no solution found")
     return schedule
 
 
