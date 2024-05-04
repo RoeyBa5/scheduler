@@ -63,7 +63,7 @@ def delete_schedule(schedule_id: str):
 @router.post("/schedules/generate")
 def generate_schedule(schedule: Schedule2, background_tasks: BackgroundTasks):
     background_tasks.add_task(_generate_schedule, schedule)
-    return {f"message": f"Schedule generation started for {schedule.id}"}
+    return {"message": f"Schedule generation started for {schedule.id}"}
 
 
 def _generate_schedule(schedule: Schedule2):
@@ -100,8 +100,8 @@ def _extract_slots(schedule: Schedule2) -> list[SingleSlot]:
                 for position in slot.assigned_workers.keys():
                     slots.append(SingleSlot(
                         id=slot.id,
-                        start_time=slot.start,
-                        end_time=slot.end,
+                        start_time=slot.start - timedelta(hours=2),
+                        end_time=slot.end - timedelta(hours=2),
                         group_id=group.id,
                         qualification=position,
                         description=slot.name,

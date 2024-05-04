@@ -8,7 +8,7 @@ from solver.temp_models import Placement, Group, PlacementModel, PlacementModelC
 from solver.temp_models import SingleSlot, Operator
 
 KARKAI_MULTIPLIER = 0.6
-SHIFTS_PER_MIL = 2
+SHIFTS_PER_MIL = 3
 
 
 class NoSolutionFound(Exception):
