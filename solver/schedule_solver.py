@@ -141,7 +141,7 @@ class ScheduleSolver:
                     for slot in self.slots if Placement(operator, slot) in model.placements
                     if is_night_slot(slot)
                 )
-                model.model.Add(night_count_per_op <= int(SHIFTS_PER_MIL * config.balance_ratio / 2))
+                # model.model.Add(night_count_per_op <= int(SHIFTS_PER_MIL * config.balance_ratio / 2))
             # Add constarint that minimize the amount of nights for each operator who is not Mil.
             night_count = len(
                 [slot for slot in self.slots if is_night_slot(slot) - SHIFTS_PER_MIL * len(mil_ops) / 2]) / len(
