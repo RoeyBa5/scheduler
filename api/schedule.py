@@ -88,7 +88,7 @@ def get_schedule(schedule_id: str) -> Schedule2:
         raise HTTPException(status_code=404, detail="No schedule found with given id")
     schedule = Schedule2.parse_obj(db_schedule)
     if not schedule.is_generated:
-        raise HTTPException(status_code=404, detail="We tried to find solution for you schedule, but no solution found")
+        raise HTTPException(status_code=500, detail="We tried to find solution for you schedule, but no solution found")
     return schedule
 
 
